@@ -2,7 +2,8 @@ import random
 import numpy as np
 from conf_validator import check_config, ConfigModel
 from enum import Enum
-from typing import cast
+from typing import Any, cast
+from maze_visuals import ImgData
 
 import time
 
@@ -19,6 +20,30 @@ class Walls(Enum):
     E = 0b1101
     S = 0b1011
     W = 0b0111
+
+
+class Cell():
+    def __init__(self, x: int | None, y: int | None,
+                 visited: bool = False, untouchable: bool = False) -> None:
+        self.pos = (x, y)
+        self.visited = bool(visited)
+        self.untouchable = bool(untouchable)
+        self.walls = 0b1111
+        self.visual: ImgData | None = None
+
+    def __repr__(self) -> str:
+        return f"{self.pos}"
+
+    def open_wall(self, direction: str) -> None:
+        wall = Walls[direction].value
+        self.walls &= wall
+
+    def open_opposite(self, direction: str) -> None:
+        if direction == 'N' or direction == 'S':
+            opp_direction = Walls[direction].value ^ 0b0101
+        else:
+            opp_direction = Walls[direction].value ^ 0b1010
+        self.walls &= opp_direction
 
 
 class MazeGenerator():
@@ -103,7 +128,6 @@ class MazeGenerator():
             cell = corners[i]
             x, y = cell.pos[0], cell.pos[1]
             directions = list(Directions)
-            nx, ny = 0, 0
             while directions:
                 new_dir = random.choice(directions)
                 directions.remove(new_dir)
@@ -137,7 +161,6 @@ class MazeGenerator():
     def walk(self, x: int | None, y: int | None) \
             -> tuple[int, int] | tuple[None, None]:
         directions = list(Directions)
-        nx, ny = 0, 0
         cell = self.get_cell(x, y)
         cell.visited = True
         while directions:
@@ -208,26 +231,3 @@ class MazeGenerator():
             file.write(f"{self.entry[0]},{self.entry[1]}\n")
             file.write(f"{self.exit[0]},{self.exit[1]}\n")
             file.close()
-
-
-class Cell():
-    def __init__(self, x: int | None, y: int | None,
-                 visited: bool = False, untouchable: bool = False) -> None:
-        self.pos = (x, y)
-        self.visited = bool(visited)
-        self.untouchable = bool(untouchable)
-        self.walls = 0b1111
-
-    def __repr__(self) -> str:
-        return f"{self.pos}"
-
-    def open_wall(self, direction: str) -> None:
-        wall = Walls[direction].value
-        self.walls &= wall
-
-    def open_opposite(self, direction: str) -> None:
-        if direction == 'N' or direction == 'S':
-            opp_direction = Walls[direction].value ^ 0b0101
-        else:
-            opp_direction = Walls[direction].value ^ 0b1010
-        self.walls &= opp_direction

@@ -1,6 +1,6 @@
 import sys
 import random
-from typing import TypedDict, NotRequired
+from typing_extensions import TypedDict, NotRequired
 from dotenv import dotenv_values
 
 

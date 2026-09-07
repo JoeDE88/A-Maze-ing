@@ -1,5 +1,6 @@
 from random import randint
 from maze_gen import MazeGenerator
+from maze_visuals import MLXVar
 
 if __name__ == "__main__":
     # try:
@@ -59,11 +60,13 @@ if __name__ == "__main__":
                 if y == m.width:
                     print(f"|{x}")
 
+        xvar = MLXVar(m)
+        xvar.renderize()
         # for x in range(m.height):
         #     y = 0
         #     for y in range(m.width):
         #         print(f"{m.grid[x][y].walls:04b}")
         # m.gen_output()
-        m.solve()
+        # m.solve()
     # except Exception as e:
     #     print(f"error: {e}")
