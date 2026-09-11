@@ -3,10 +3,12 @@ from maze_gen import MazeGenerator
 from maze_visuals import MLXVar
 
 if __name__ == "__main__":
-    # try:
+    try:
+        # CREAR CLASE MazeGenerator PARA GENERAR LABERINTO
         m = MazeGenerator()
         m.gen_maze()
-        # print(m.grid)
+
+        # -- TODA ESTA PARTE ES PARA SOLO PARA IMPRIMIR EL MAZE EN LA TERMINAL --
         print(f"\n\nPerfect: {str(m.perfect).upper()}")
         print("   ", end="")
         for i in range(m.width):
@@ -27,7 +29,7 @@ if __name__ == "__main__":
                 if m.grid[x][y].untouchable:
                     startcolor = f"\033[{fg};{fg + 10}m"
                 elif m.grid[x][y].pos == m.entry:
-                    startcolor = f"\033[0;{102}m"
+                    startcolor = f"\033[0{95}m"
                 elif m.grid[x][y].pos == m.exit:
                     startcolor = f"\033[{43};{43+10}m"
                 else:
@@ -59,14 +61,17 @@ if __name__ == "__main__":
                 y += 1
                 if y == m.width:
                     print(f"|{x}")
-
+        # -- FIN MAZE EN TERMINAL --
+        
+        # PARA INICIAR MAZE EN MINILIBX
         xvar = MLXVar(m)
-        xvar.renderize()
-        # for x in range(m.height):
-        #     y = 0
-        #     for y in range(m.width):
-        #         print(f"{m.grid[x][y].walls:04b}")
-        # m.gen_output()
-        # m.solve()
-    # except Exception as e:
-    #     print(f"error: {e}")
+        # xvar.renderize()
+
+        # PARA RESOLVER ECONTRAR RUTA MAS CORTA ENTRE entry Y exit
+        m.solve()
+
+        # PARA GENERAR OUTPUT FILE
+        m.gen_output()
+        
+    except Exception as e:
+        print(f"error: {e}")
