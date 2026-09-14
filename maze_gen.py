@@ -27,7 +27,7 @@ class Walls(Enum):
 
 # CELDAS
 class Cell():
-    def __init__(self, x: int | None, y: int | None,
+    def __init__(self, x: int, y: int,
                  visited: bool = False, untouchable: bool = False) -> None:
         self.pos = (x, y)
         self.visited = bool(visited)
@@ -97,7 +97,7 @@ class MazeGenerator():
                 self.grid[x][y] = Cell(x, y)
 
     # FUNCIÓN PARA OBTENER LA CELDA SEGÚN POSICIÓN x, y
-    def get_cell(self, x: int | None, y: int | None) -> Cell:
+    def get_cell(self, x: int, y: int) -> Cell:
         return cast(Cell, self.grid[x][y])
 
     # FUNCIÓN PARA OBTENER LA LISTA DE LAS CELDAS EN LAS 4 ESQUINAS CON 3 PAREDES 
@@ -171,15 +171,16 @@ class MazeGenerator():
 
     # FUNCIÓN PRINCIPAL DEL ALGORITMO
     def gen_maze(self) -> None:
-        pos: tuple[int, int] | tuple[None, None] = self.entry
+        pos: tuple[int, int] = self.entry
         x2, y2 = pos
         while True:
             x, y = x2, y2
-            if x is None:
+            if x == -1:
+                print("break")
                 break
-            while x is not None:
+            while x != -1:
                 x, y = self.walk(x, y)
-            while x2 is not None:
+            while x2 != -1:
                 x2, y2 = self.hunt(x2, y2)
                 break
         if not self.perfect:
@@ -193,16 +194,15 @@ class MazeGenerator():
     # que la siguiente celda no haya ya sido visitada,
     # que la siguiente celda no sea parte de las que forman el 42
     # si todo esto pasa, abre las paredes de ambas
-    def walk(self, x: int | None, y: int | None) \
-            -> tuple[int, int] | tuple[None, None]:
+    def walk(self, x: int, y: int) \
+            -> tuple[int, int]:
         directions = list(Directions)
         cell = self.get_cell(x, y)
         cell.visited = True
         while directions:
             new_dir = random.choice(directions)
             directions.remove(new_dir)
-            if x is not None and y is not None:
-                nx, ny = x + new_dir.value[0], y + new_dir.value[1]
+            nx, ny = x + new_dir.value[0], y + new_dir.value[1]
             if all(
                    [
                     nx >= 0,
@@ -217,7 +217,7 @@ class MazeGenerator():
                     cell.open_wall(new_dir.name)
                     n_cell.open_opposite(new_dir.name)
                     return (nx, ny)
-        return (None, None)
+        return (-1, -1)
 
     # FUNCIÓN AUXILIAR DE hunt() PARA ENCONTRAR CELDAS VECINAS EXISTENTES Y YA VISITADAS
     def find_neighbors(self, x: int, y: int) -> list[Directions]:
@@ -239,8 +239,8 @@ class MazeGenerator():
     # SEGUNDA PARTE DEL ALGORITMO
     # empezando desde la celda de entrada, encuentra la primera celda que no haya sido visitada
     # cuando la encuentra, verifica que tenga una celda vecina ya visitada, y abre las paredes de ambas 
-    def hunt(self, x: int | None, y: int | None) \
-            -> tuple[int, int] | tuple[None, None]:
+    def hunt(self, x: int, y: int) \
+            -> tuple[int, int]:
         for x in range(self.height):
             for y in range(self.width):
                 cell: Cell = self.get_cell(x, y)
@@ -255,7 +255,7 @@ class MazeGenerator():
                         cell.open_wall(new_dir.name)
                         ncell.open_opposite(new_dir.name)
                     return (x, y)
-        return (None, None)
+        return (-1, -1)
 
 
     #####################################################################################
