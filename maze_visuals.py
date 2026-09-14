@@ -1,5 +1,5 @@
 from mlx import Mlx
-from typing import Any, cast, TYPE_CHECKING
+from typing import Any, cast
 import random
 from maze_gen import MazeGenerator, Cell
 
@@ -82,7 +82,7 @@ class MLXVar:
         elif cell.pos == self.maze.entry:
             self.put_square(img, x + 5, y + 5, entry_col)
         elif cell.pos == self.maze.exit:
-            self.put_square(img, x , y, exit_col)
+            self.put_square(img, x, y, exit_col)
         else:
             self.put_square(img, x, y, path_col)
         self.draw_wall(img, x, y, cell.walls, walls_col)

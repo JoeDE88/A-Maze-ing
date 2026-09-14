@@ -51,14 +51,14 @@ def parse_config(config: ConfigModel) -> None:
         raise Exception("Exit position can't be negative")
 
 
-def cast_value(value: str | None) -> tuple[int, int]:
+def cast_value(value: str) -> tuple[int, int]:
     if value is not None:
         x, y = value.split(",")
     keys = (int(x), int(y))
     return keys
 
 
-def parse_bool(value: str | None) -> bool:
+def parse_bool(value: str) -> bool:
     if value == "True":
         return True
     if value == "False":
@@ -72,8 +72,12 @@ def check_config() -> ConfigModel:
         raise Exception("Number of arguments has to be 2.\n"
                         f"Example of usage: ./{sys.argv[0]} config.txt")
     env = dotenv_values(sys.argv[1])
-    if not set(keys_list).issubset(env.keys()):
-        raise Exception(f"{sys.argv[1]} file has missing or invalid keys")
+    diff = set(keys_list).difference(env.keys())
+    if diff:
+        raise Exception(f"{sys.argv[1]} file has missing or invalid keys: {list(diff)}")
+    assert isinstance(env["ENTRY"], str)
+    assert isinstance(env["EXIT"], str)
+    assert isinstance(env["PERFECT"], str)
     config: ConfigModel = {
         "WIDTH": int(str(env["WIDTH"])),
         "HEIGHT": int(str(env["HEIGHT"])),

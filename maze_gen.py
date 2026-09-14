@@ -25,6 +25,7 @@ class Walls(Enum):
     S = 0b1011
     W = 0b0111
 
+
 # CELDAS
 class Cell():
     def __init__(self, x: int, y: int,
@@ -59,7 +60,9 @@ class MazeGenerator():
         self.entry: tuple[int, int] = config["ENTRY"]
         self.exit: tuple[int, int] = config["EXIT"]
         self.perfect: bool = config["PERFECT"]
-        self.grid: np.ndarray[Any, np.dtype[Any]] = np.empty((self.height, self.width), dtype=object)
+        self.grid: np.ndarray[Any, np.dtype[Any]] = np.empty((self.height,
+                                                             self.width),
+                                                             dtype=object)
         self.one_walls: list[int] = [0b0111, 0b1011, 0b1101, 0b1110]
         self.populate_grid()
         self.solution: list[str] = []
@@ -100,7 +103,7 @@ class MazeGenerator():
     def get_cell(self, x: int, y: int) -> Cell:
         return cast(Cell, self.grid[x][y])
 
-    # FUNCIÓN PARA OBTENER LA LISTA DE LAS CELDAS EN LAS 4 ESQUINAS CON 3 PAREDES 
+    # FUNCIÓN PARA OBTENER LA LISTA DE LAS CELDAS EN LAS 4 ESQUINAS CON 3 PAREDES
     def get_corners(self) -> list[Cell]:
         corners = []
         if self.get_cell(0, 0).walls in self.one_walls:
@@ -124,8 +127,7 @@ class MazeGenerator():
             while directions:
                 new_dir = random.choice(directions)
                 directions.remove(new_dir)
-                if x is not None and y is not None:
-                    nx, ny = x + new_dir.value[0], y + new_dir.value[1]
+                nx, ny = x + new_dir.value[0], y + new_dir.value[1]
                 if all(
                        [
                         nx >= 0,
@@ -176,7 +178,6 @@ class MazeGenerator():
         while True:
             x, y = x2, y2
             if x == -1:
-                print("break")
                 break
             while x != -1:
                 x, y = self.walk(x, y)
@@ -257,13 +258,10 @@ class MazeGenerator():
                     return (x, y)
         return (-1, -1)
 
-
     #####################################################################################
     #       AQUÌ EMPIEZAN LAS FUNCIONES PARA ENCONTRAR EL CAMINO                        #
     #       ALGORITMO: DIJKSTRA                                                         #
-    #####################################################################################    
-
-
+    #####################################################################################
     def possible_directions(self, x: int, y: int) -> list[tuple[int, int]]:
         cell = self.get_cell(x, y)
         directions: list[tuple[int, int]] = []
@@ -283,7 +281,7 @@ class MazeGenerator():
         end = list(self.exit)
         solution: list[list[int | list[int]]] = []
         visited = [[False for _ in range(self.width)]
-                    for _ in range(self.height)]
+                   for _ in range(self.height)]
         visited[start[0]][start[1]] = True
         queue: list[list[int | list[int]]] = []
 
@@ -304,8 +302,9 @@ class MazeGenerator():
                 x = cell[0] + open_dir[i][0]
                 y = cell[1] + open_dir[i][1]
 
-                if (((x >= 0) and (x < self.height) and (y >= 0) and (y < self.width)) and
-                not visited[x][y]):
+                if (((x >= 0) and (x < self.height)
+                   and (y >= 0) and (y < self.width))
+                   and not visited[x][y]):
                     if not self.get_cell(x, y).untouchable:
                         visited[x][y] = True
                         n_cell: list[int | list[int]] = [dist + 1, [x, y]]
@@ -320,7 +319,8 @@ class MazeGenerator():
         directions = self.possible_directions(x, y)
         neighbor = False
         for i in range(len(directions)):
-            if n_cell.pos[0] == x + directions[i][0] and n_cell.pos[1] == y + directions[i][1]:
+            if n_cell.pos[0] == x + directions[i][0] \
+               and n_cell.pos[1] == y + directions[i][1]:
                 neighbor = True
         return neighbor
 
@@ -329,25 +329,26 @@ class MazeGenerator():
         distance: int | None = None
         prev_cell: list[int] | None = None
         for i in range(len(solution)-1, -1, -1):
-            position = solution[i][1]
+            pos = solution[i][1]
             step = solution[i][0]
             assert isinstance(step, int)
-            assert isinstance(position, list)
+            assert isinstance(pos, list)
             if not distance and not prev_cell:
-                if position == list(self.exit):
+                if pos == list(self.exit):
                     distance = step - 1
-                    prev_cell = position
+                    prev_cell = pos
             else:
-                nx, ny = position[0], position[1]
+                nx, ny = pos[0], pos[1]
                 assert isinstance(prev_cell, list)
                 assert isinstance(distance, int)
                 x, y = prev_cell[0], prev_cell[1]
-                is_neighbor = self.check_neighbor(self.get_cell(x, y), self.get_cell(nx, ny))
+                is_neighbor = self.check_neighbor(self.get_cell(x, y),
+                                                  self.get_cell(nx, ny))
                 if distance == step and is_neighbor:
-                    direction = position[0] - prev_cell[0], position[1] - prev_cell[1]
+                    direction = pos[0] - prev_cell[0], pos[1] - prev_cell[1]
                     path.append(Directions(direction).name)
                     distance -= 1
-                    prev_cell = position
+                    prev_cell = pos
         return path
 
     def solve(self) -> None:
