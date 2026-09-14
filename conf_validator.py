@@ -74,7 +74,7 @@ def check_config() -> ConfigModel:
     env = dotenv_values(sys.argv[1])
     diff = set(keys_list).difference(env.keys())
     if diff:
-        raise Exception(f"{sys.argv[1]} file has missing or invalid keys: {list(diff)}")
+        raise Exception(f"{sys.argv[1]} file has missing keys: {list(diff)}")
     assert isinstance(env["ENTRY"], str)
     assert isinstance(env["EXIT"], str)
     assert isinstance(env["PERFECT"], str)

@@ -239,7 +239,7 @@ class MazeGenerator():
 
     # SEGUNDA PARTE DEL ALGORITMO
     # empezando desde la celda de entrada, encuentra la primera celda que no haya sido visitada
-    # cuando la encuentra, verifica que tenga una celda vecina ya visitada, y abre las paredes de ambas 
+    # cuando la encuentra, verifica que tenga una celda vecina ya visitada, y abre las paredes de ambas
     def hunt(self, x: int, y: int) \
             -> tuple[int, int]:
         for x in range(self.height):

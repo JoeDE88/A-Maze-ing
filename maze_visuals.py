@@ -88,15 +88,15 @@ class MLXVar:
         self.draw_wall(img, x, y, cell.walls, walls_col)
 
     def renderize(self) -> None:
-        self.mlx = Mlx()  # type: ignore[no-untyped-call]
-        self.mlx_ptr = self.mlx.mlx_init()  # type: ignore[no-untyped-call]
+        self.mlx = Mlx()
+        self.mlx_ptr = self.mlx.mlx_init()
 
         self.win_1 = self.mlx.mlx_new_window(
             self.mlx_ptr,
             self.screen_w,
             self.screen_h,
             "A_Maze_Ing"
-        )  # type: ignore[no-untyped-call]
+        )
 
         self.img_1 = ImgData()
         self.img_1.width = self.maze.width * 30
@@ -104,14 +104,14 @@ class MLXVar:
         self.img_1.img = self.mlx.mlx_new_image(
                        self.mlx_ptr,
                        self.img_1.width,
-                       self.img_1.height)  # type: ignore[no-untyped-call]
+                       self.img_1.height)
 
         (self.img_1.data,
          self.img_1.bpp,
          self.img_1.sl,
          self.img_1.iformat
          ) = self.mlx.mlx_get_data_addr(
-            self.img_1.img)  # type: ignore[no-untyped-call]
+            self.img_1.img)
 
         for x in range(self.maze.height):
             for y in range(self.maze.width):
@@ -127,6 +127,6 @@ class MLXVar:
             self.win_1,
             self.img_1.img,
             20,
-            20)  # type: ignore[no-untyped-call]
+            20)
 
-        self.mlx.mlx_loop(self.mlx_ptr)  # type: ignore[no-untyped-call]
+        self.mlx.mlx_loop(self.mlx_ptr)
