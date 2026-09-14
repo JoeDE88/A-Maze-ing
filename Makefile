@@ -4,17 +4,17 @@ $(VENV):
 	python3 -m venv $(VENV);
 
 install:
-	pip install -r requirements.txt
+	uv pip install -r requirements.txt
 
 unpack:
 	tar -xvf mlx-2.2.tgz
 	unzip ubuntu/mlx-2.2-py3-none-any.whl
 
 run:
-	python3 a_maze_ing.py config.txt
+	uv run a_maze_ing.py config.txt
 
 debug:
-	python3 -m pdb a_maze_ing.py config.txt
+	uv run python3 -m pdb a_maze_ing.py config.txt
 
 clean:
 	rm -rf ubuntu fedora src mlx-2.2.dist-info
