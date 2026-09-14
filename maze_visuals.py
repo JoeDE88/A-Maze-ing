@@ -1,10 +1,7 @@
 from mlx import Mlx
-from typing import TYPE_CHECKING, Any, cast
+from typing import Any, cast, TYPE_CHECKING
 import random
-
-
-if TYPE_CHECKING:
-    from maze_gen import MazeGenerator, Cell
+from maze_gen import MazeGenerator, Cell
 
 
 class ImgData:

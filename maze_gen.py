@@ -1,7 +1,7 @@
 import numpy as np
 from conf_validator import check_config, ConfigModel
 from enum import Enum
-from typing import cast, TYPE_CHECKING
+from typing import cast, TYPE_CHECKING, Any
 import random
 
 if TYPE_CHECKING:
@@ -59,7 +59,7 @@ class MazeGenerator():
         self.entry: tuple[int, int] = config["ENTRY"]
         self.exit: tuple[int, int] = config["EXIT"]
         self.perfect: bool = config["PERFECT"]
-        self.grid: np.ndarray = np.ndarray((self.height, self.width), dtype=object)
+        self.grid: np.ndarray[Any, np.dtype[Any]] = np.empty((self.height, self.width), dtype=object)
         self.one_walls: list[int] = [0b0111, 0b1011, 0b1101, 0b1110]
         self.populate_grid()
         self.solution: list[str] = []

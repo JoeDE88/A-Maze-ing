@@ -65,7 +65,7 @@ if __name__ == "__main__":
         
         # PARA INICIAR MAZE EN MINILIBX
         xvar = MLXVar(m)
-        # xvar.renderize()
+        xvar.renderize()
 
         # PARA RESOLVER ECONTRAR RUTA MAS CORTA ENTRE entry Y exit
         m.solve()
