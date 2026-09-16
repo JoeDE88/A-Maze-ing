@@ -1,3 +1,5 @@
+import time
+
 from mlx import Mlx
 from typing import Any, cast
 import random
@@ -16,7 +18,7 @@ class ImgData:
 
 
 class MLXVar:
-    cell_size = 25
+    cell_size: int = 15
 
     def __init__(self, maze: MazeGenerator) -> None:
         self.mlx: Mlx | None = None
@@ -70,7 +72,7 @@ class MLXVar:
             for dy in range(self.cell_size):
                 self.put_pixel_to_img(img, x + dx, y + dy, color)
 
-    def put_cell(self, img: ImgData, cell: Cell, x: int, y: int) -> None:
+    def draw_cell(self, img: ImgData, cell: Cell, x: int, y: int) -> None:
         path_col = (0, 0, 0)
         col = random.randint(50, 255)
         walls_col = (col, col, col)
@@ -99,8 +101,8 @@ class MLXVar:
         )
 
         self.img_1 = ImgData()
-        self.img_1.width = self.maze.width * 30
-        self.img_1.height = self.maze.height * 30
+        self.img_1.width = self.maze.width * self.cell_size
+        self.img_1.height = self.maze.height * self.cell_size
         self.img_1.img = self.mlx.mlx_new_image(
                        self.mlx_ptr,
                        self.img_1.width,
@@ -116,7 +118,7 @@ class MLXVar:
         for x in range(self.maze.height):
             for y in range(self.maze.width):
                 cell: Cell = self.maze.get_cell(x, y)
-                self.put_cell(
+                self.draw_cell(
                     self.img_1,
                     cell,
                     y * self.cell_size,

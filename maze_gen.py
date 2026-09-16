@@ -30,9 +30,9 @@ class Walls(Enum):
 class Cell():
     def __init__(self, x: int, y: int,
                  visited: bool = False, untouchable: bool = False) -> None:
-        self.pos = (x, y)
-        self.visited = bool(visited)
-        self.untouchable = bool(untouchable)
+        self.pos: tuple[int, int] = (x, y)
+        self.visited: bool = bool(visited)
+        self.untouchable: bool = bool(untouchable)
         self.walls: int = 0b1111
         self.visual: ImgData | None = None
 
