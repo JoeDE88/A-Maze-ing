@@ -18,11 +18,11 @@ class ImgData:
 
 
 class MLXVar:
-    cell_size: int = 15
+    cell_size: int = 20
 
     def __init__(self, maze: MazeGenerator) -> None:
         self.mlx: Mlx | None = None
-        self.mlx_ptr: Any | None = None
+        self.mlx_ptr: int = 0
         self.maze: MazeGenerator = maze
         self.screen_w: int = maze.width * self.cell_size + 40
         self.screen_h: int = maze.height * self.cell_size + 90
@@ -89,6 +89,15 @@ class MLXVar:
             self.put_square(img, x, y, path_col)
         self.draw_wall(img, x, y, cell.walls, walls_col)
 
+    def press_key(self, keynum: int, param: Any) -> None:
+        if keynum == 113:
+            self.close_mini(param)
+
+    def close_mini(self, param: None) -> None:
+        assert isinstance(self.mlx, Mlx)
+        del param
+        self.mlx.mlx_loop_exit(self.mlx_ptr)
+
     def renderize(self) -> None:
         self.mlx = Mlx()
         self.mlx_ptr = self.mlx.mlx_init()
@@ -131,4 +140,11 @@ class MLXVar:
             20,
             20)
 
+        self.mlx.mlx_key_hook(self.win_1, self.press_key, None)
+        self.mlx.mlx_hook(self.win_1, 33, 0, self.close_mini, None)
+
         self.mlx.mlx_loop(self.mlx_ptr)
+
+        self.mlx.mlx_destroy_image(self.mlx_ptr, self.img_1.img)
+        self.mlx.mlx_destroy_window(self.mlx_ptr, self.win_1)
+        self.mlx.mlx_release(self.mlx_ptr)
