@@ -1,1 +1,63 @@
-uv.lock
+cat > .gitignore << 'EOF'
+# Entornos virtuales
+.venv/
+venv/
+env/
+ENV/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+dist/
+*.egg-info/
+*.egg
+.eggs/
+
+# Testing / coverage
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.nox/
+
+# Variables de entorno y secretos
+.env
+.env.*
+!.env.example
+*.env
+secrets.json
+
+# Editores / IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Logs
+*.log
+logs/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# MyPy / Ruff / cache
+.mypy_cache/
+.ruff_cache/
+.dmypy.json
+
+# Compilados de C (por si compilas MiniLibX)
+*.o
+*.a
+*.out
+EOF
