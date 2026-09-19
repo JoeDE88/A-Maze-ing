@@ -63,12 +63,14 @@ if __name__ == "__main__":
                     print(f"|{x}")
         # -- FIN MAZE EN TERMINAL --
         
+        # PARA RESOLVER ENCONTRAR RUTA MAS CORTA ENTRE entry Y exit
+        # (se hace ANTES de abrir la ventana para que el menú de la
+        # ventana MLX pueda mostrar/esconder la solución desde el inicio)
+        m.solve()
+
         # PARA INICIAR MAZE EN MINILIBX
         xvar = MLXVar(m)
         xvar.renderize()
-
-        # PARA RESOLVER ECONTRAR RUTA MAS CORTA ENTRE entry Y exit
-        m.solve()
 
         # PARA GENERAR OUTPUT FILE
         m.gen_output()
