@@ -1,5 +1,5 @@
 import numpy as np
-from conf_validator import check_config, ConfigModel
+from .conf_validator import check_config, ConfigModel
 from enum import Enum
 from typing import cast, Any
 import random

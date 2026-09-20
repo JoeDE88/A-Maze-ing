@@ -18,5 +18,5 @@ exclude = [
 disallow_untyped_calls = true
 
 [[tool.mypy.overrides]]
-module = "mlx/*"
-follow_imports="skip"
+module = "mlx"
+ignore_missing_imports = true

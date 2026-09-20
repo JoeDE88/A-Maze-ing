@@ -41,7 +41,8 @@ class MLXVar:
         # -- ESTADO DEL MENÚ INTERACTIVO --
         self.show_solution: bool = False
         self.wall_color_idx: int = 0
-        self.solution_cells: set[tuple[int, int]] = self.compute_solution_cells()
+        self.solution_cells: set[tuple[int, int]] = \
+            self.compute_solution_cells()
 
     def put_pixel_to_img(self, img: ImgData,
                          x: int, y: int, color: int) -> None:
@@ -146,7 +147,8 @@ class MLXVar:
 
     # OPCIÓN 3 DEL MENÚ: ROTAR EL COLOR DE LAS PAREDES
     def rotate_wall_color(self) -> None:
-        self.wall_color_idx = (self.wall_color_idx + 1) % len(self.wall_palette)
+        self.wall_color_idx = (self.wall_color_idx + 1) \
+            % len(self.wall_palette)
         print(f"[A-Maze-ing] Color de paredes #{self.wall_color_idx + 1}.")
         self.redraw()
 
@@ -164,7 +166,7 @@ class MLXVar:
         self.solution_cells = self.compute_solution_cells()
         self.redraw()
 
-    # VUELVE A DIBUJAR TODAS LAS CELDAS DEL LABERINTO ACTUAL Y REFRESCA LA VENTANA
+    # VUELVE A DIBUJAR EL LABERINTO ACTUAL Y REFRESCA LA VENTANA
     def redraw(self) -> None:
         assert isinstance(self.mlx, Mlx)
         assert isinstance(self.img_1, ImgData)

@@ -1,4 +1,4 @@
-*This project has been created as part of the 42 curriculum by \<jdiaz-ec\>, \<gblas-he\>.*
+*This project has been created as part of the 42 curriculum by jdiaz-ec, gblas-he.*
 
 # A-Maze-ing
 
@@ -163,7 +163,7 @@ The maze generation logic lives entirely in `maze_gen.py`, inside the
 ### Basic usage
 
 ```python
-from maze_gen import MazeGenerator
+from mazegen import MazeGenerator
 
 # NOTE: MazeGenerator reads its configuration through conf_validator.check_config(),
 # which itself reads sys.argv[1] as the path to a config file
@@ -247,7 +247,7 @@ being committed; nothing was used without being able to explain how it works.
 
 *(To be filled in by the team.)*
 
-- **Team members and roles**: <login1> — ..., <login2> — ...
+- **Team members and roles**: jdiaz-ec, gblas-he
 - **Planning**: initial plan, and how it evolved through the project.
 - **What worked well / what could be improved**.
 - **Specific tools used**: e.g. `uv` for dependency management, `mypy`/`flake8`

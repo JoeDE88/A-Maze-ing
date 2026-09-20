@@ -1,11 +1,10 @@
-cat > .gitignore << 'EOF'
-# Entornos virtuales
+# --- Entornos virtuales ---
 .venv/
 venv/
 env/
 ENV/
 
-# Python
+# --- Python ---
 __pycache__/
 *.py[cod]
 *$py.class
@@ -17,7 +16,14 @@ dist/
 *.egg
 .eggs/
 
-# Testing / coverage
+# --- Empaquetado del módulo reusable (mazegen-*) ---
+*.egg-info/
+wheelhouse/
+
+# --- MiniLibX: artefacto de "make unpack" ---
+mlx_CLXV/
+
+# --- Testing / coverage ---
 .pytest_cache/
 .coverage
 .coverage.*
@@ -25,41 +31,42 @@ htmlcov/
 .tox/
 .nox/
 
-# Variables de entorno y secretos
+# --- Type checking / lint cache ---
+.mypy_cache/
+.ruff_cache/
+.dmypy.json
+
+# --- Variables de entorno y secretos ---
 .env
 .env.*
 !.env.example
-*.env
 secrets.json
+*.env
 
-# Editores / IDE
+# --- Editores / IDE ---
 .vscode/
 .idea/
 *.swp
 *.swo
 *~
 
-# Sistema operativo
+# --- Sistema operativo ---
 .DS_Store
 Thumbs.db
 desktop.ini
 
-# Logs
+# --- Logs ---
 *.log
 logs/
 
-# Jupyter
+# --- Jupyter ---
 .ipynb_checkpoints/
 
-# MyPy / Ruff / cache
-.mypy_cache/
-.ruff_cache/
-.dmypy.json
-
-# Compilados de C (por si compilas MiniLibX)
+# --- Compilados de C (por si compilas MiniLibX) ---
 *.o
 *.a
 *.out
-EOF
 
-*.lock
+# --- Salidas generadas al ejecutar el programa ---
+output_maze.txt
+uv.lock
