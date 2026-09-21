@@ -1,0 +1,20 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mazegen"
+version = "1.0.0"
+description = "Generador de laberintos reutilizable (proyecto A-Maze-ing, 42)"
+readme = "README.md"
+requires-python = ">=3.10"
+license = "MIT"
+license-files = ["LICENSE.md"]
+dependencies = [
+    "numpy>=2.0",
+    "python-dotenv>=1.0",
+    "typing_extensions>=4.0",
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
