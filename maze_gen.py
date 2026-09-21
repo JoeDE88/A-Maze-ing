@@ -51,10 +51,8 @@ class MazeGenerator():
         self.width: int = config["WIDTH"]
         self.height: int = config["HEIGHT"]
         self.center: tuple[int, int] = (self.height // 2, self.width // 2)
-        self.entry: tuple[int, int] = (config["ENTRY"][1],
-                                       config["ENTRY"][0])
-        self.exit: tuple[int, int] = (config["EXIT"][1],
-                                      config["EXIT"][0])
+        self.entry: tuple[int, int] = config["ENTRY"]
+        self.exit: tuple[int, int] = config["EXIT"]
         self.perfect: bool = config["PERFECT"]
         self.grid: np.ndarray[Any, np.dtype[Any]] = np.empty((self.height,
                                                              self.width),
