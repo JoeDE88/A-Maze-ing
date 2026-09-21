@@ -16,7 +16,7 @@ class ImgData:
 
 
 class MLXVar:
-    cell_size: int = 20
+    cell_size: int = 30
 
     # PALETA DE COLORES DISPONIBLES PARA LAS PAREDES (SE ROTA CON LA TECLA '3')
     wall_palette: list[tuple[int, int, int]] = [
