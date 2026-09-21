@@ -4,6 +4,16 @@ from typing_extensions import TypedDict, NotRequired
 from dotenv import dotenv_values
 
 
+default_config: ConfigModel = {
+    "WIDTH": 10,
+    "HEIGHT": 10,
+    "ENTRY": (0,0),
+    "EXIT": (0,0),
+    "OUTPUT_FILE": "default_output.txt",
+    "PERFECT": True
+}
+
+
 class ConfigModel(TypedDict):
     WIDTH: int
     HEIGHT: int
@@ -71,23 +81,32 @@ def check_config() -> ConfigModel:
     if len(sys.argv) != 2:
         raise Exception("Number of arguments has to be 2.\n"
                         f"Example of usage: ./{sys.argv[0]} config.txt")
-    env = dotenv_values(sys.argv[1])
-    diff = set(keys_list).difference(env.keys())
-    if diff:
-        raise Exception(f"{sys.argv[1]} file has missing keys: {list(diff)}")
-    assert isinstance(env["ENTRY"], str)
-    assert isinstance(env["EXIT"], str)
-    assert isinstance(env["PERFECT"], str)
-    config: ConfigModel = {
-        "WIDTH": int(str(env["WIDTH"])),
-        "HEIGHT": int(str(env["HEIGHT"])),
-        "ENTRY": cast_value(env["ENTRY"]),
-        "EXIT": cast_value(env["EXIT"]),
-        "OUTPUT_FILE": str(str(env["OUTPUT_FILE"])),
-        "PERFECT": parse_bool(env["PERFECT"])
-    }
-    if "SEED" in env and env["SEED"] != "":
-        random.seed(env["SEED"])
-    parse_config(config)
-    check_inbounds(config)
-    return config
+    try:
+        env = dotenv_values(sys.argv[1])
+        diff = set(keys_list).difference(env.keys())
+        if diff:
+            raise Exception(f"{sys.argv[1]} file has missing keys: {list(diff)}")
+        assert isinstance(env["ENTRY"], str)
+        assert isinstance(env["EXIT"], str)
+        assert isinstance(env["PERFECT"], str)
+        config: ConfigModel = {
+            "WIDTH": int(str(env["WIDTH"])),
+            "HEIGHT": int(str(env["HEIGHT"])),
+            "ENTRY": cast_value(env["ENTRY"]),
+            "EXIT": cast_value(env["EXIT"]),
+            "OUTPUT_FILE": str(str(env["OUTPUT_FILE"])),
+            "PERFECT": parse_bool(env["PERFECT"])
+        }
+        if "SEED" in env and env["SEED"] != "":
+            random.seed(env["SEED"])
+        parse_config(config)
+        check_inbounds(config)
+        return config
+    except PermissionError as p:
+        if p.errno == 13:
+            print(f"Error: cant' access {sys.argv[1]}")
+    except Exception as e:
+        print(f"ERROR ON YOUR {sys.argv[1]}:")
+        print(e)
+        print(f"Creating a maze with default configuration:")
+    return default_config

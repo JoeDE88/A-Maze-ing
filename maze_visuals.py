@@ -18,7 +18,7 @@ class ImgData:
 
 
 class MLXVar:
-    cell_size: int = 20
+    cell_size: int = 30
 
     def __init__(self, maze: MazeGenerator) -> None:
         self.mlx: Mlx | None = None

@@ -367,19 +367,22 @@ class MazeGenerator():
     # ENTRADA, SALIDA
     # CAMINO PARA LA SALIDA
     def gen_output(self) -> None:
-        with open(self.output, "w") as file:
-            x = 0
-            for x in range(self.height):
-                y = 0
-                for y in range(self.width):
-                    file.write(f"{self.get_cell(x, y).walls:x}")
-                    y += 1
-                    if y == self.width:
-                        file.write("\n")
-                x += 1
-            file.write("\n")
-            file.write(f"{self.entry[0]},{self.entry[1]}\n")
-            file.write(f"{self.exit[0]},{self.exit[1]}\n")
-            for direction in self.solution:
-                file.write(direction)
-            file.close()
+        try:
+            with open(self.output, "w") as file:
+                x = 0
+                for x in range(self.height):
+                    y = 0
+                    for y in range(self.width):
+                        file.write(f"{self.get_cell(x, y).walls:x}")
+                        y += 1
+                        if y == self.width:
+                            file.write("\n")
+                    x += 1
+                file.write("\n")
+                file.write(f"{self.entry[0]},{self.entry[1]}\n")
+                file.write(f"{self.exit[0]},{self.exit[1]}\n")
+                for direction in self.solution:
+                    file.write(direction)
+                file.close()
+        except Exception as e:
+            print(e)

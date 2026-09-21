@@ -1,7 +1,7 @@
-VENV=.venv
+VENV=venv
 
 $(VENV):
-	python3 -m venv $(VENV);
+	uv $(VENV) --python 3.14
 
 install:
 	uv pip install -r requirements.txt
