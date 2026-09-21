@@ -28,9 +28,8 @@ it — otherwise a warning is printed and the pattern is skipped).
 
 ### Requirements
 
-- Python 3.10+ (the project targets 3.14, see `pyproject.toml`)
-- The dependencies listed in `requirements.txt` (`numpy`, `python-dotenv`,
-  `flake8`, `mypy`, ...)
+- Python 3.14+
+- The dependencies listed in `requirements.txt`
 - A working MiniLibX (MLX) Python binding (`mlx` module) for the graphical
   display — unpacked with `make unpack`
 
@@ -232,13 +231,10 @@ display and CLI parts of this repository.
 
 AI assistance was used during this project as follows:
 
-- Reviewing and discussing the Hunt & Kill and Dijkstra implementations in
-  `maze_gen.py` for correctness (wall coherence between neighbouring cells,
-  boundary handling around the "42" pattern).
 - Drafting the interactive MLX menu (`maze_visuals.py`): the keyboard-driven
   options to regenerate the maze, show/hide the shortest path, and rotate the
   wall colours, plus the corresponding `redraw()` logic.
-- Drafting this `README.md`.
+
 
 All AI-generated code was read, understood, and adapted by the team before
 being committed; nothing was used without being able to explain how it works.

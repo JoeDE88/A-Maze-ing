@@ -35,7 +35,6 @@ class MLXVar:
         self.screen_w: int = maze.width * self.cell_size + 40
         self.screen_h: int = maze.height * self.cell_size + 90
         self.win_1: Any | None = None
-        self.win_2 = None
         self.img_1: ImgData | None = None
 
         # -- ESTADO DEL MENÚ INTERACTIVO --
