@@ -8,7 +8,7 @@ if __name__ == "__main__":
         m = MazeGenerator()
         m.gen_maze()
 
-        # -- TODA ESTA PARTE ES PARA SOLO PARA IMPRIMIR EL MAZE EN LA TERMINAL --
+        # -- IMPRIME EL MAZE EN LA TERMINAL --
         print(f"\n\nPerfect: {str(m.perfect).upper()}")
         print("   ", end="")
         for i in range(m.width):
@@ -19,7 +19,7 @@ if __name__ == "__main__":
         print()
         print("    ", end="")
         print("___" * m.width, end="")
-        print() 
+        print()
         fg = randint(90, 97)
         for x in range(m.height):
             y = 0
@@ -53,7 +53,7 @@ if __name__ == "__main__":
                 if m.grid[x][y].walls in [4, 5]:
                     print(f"{startcolor}___{endcolor}", end="")
                 if m.grid[x][y].walls in [6, 7]:
-                    print(f"{startcolor}__|{endcolor}", end="")     
+                    print(f"{startcolor}__|{endcolor}", end="")
                 if m.grid[x][y].walls in [10, 11]:
                     print(f"{startcolor}| |{endcolor}", end="")
                 if m.grid[x][y].walls == 15:
@@ -62,16 +62,18 @@ if __name__ == "__main__":
                 if y == m.width:
                     print(f"|{x}")
         # -- FIN MAZE EN TERMINAL --
-        
+
+        # PARA RESOLVER ENCONTRAR RUTA MAS CORTA ENTRE entry Y exit
+        # (se hace ANTES de abrir la ventana para que el menú de la
+        # ventana MLX pueda mostrar/esconder la solución desde el inicio)
+        m.solve()
+
         # PARA INICIAR MAZE EN MINILIBX
         xvar = MLXVar(m)
         xvar.renderize()
 
-        # PARA RESOLVER ECONTRAR RUTA MAS CORTA ENTRE entry Y exit
-        m.solve()
-
         # PARA GENERAR OUTPUT FILE
         m.gen_output()
-        
+
     except Exception as e:
         print(f"error: {e}")
