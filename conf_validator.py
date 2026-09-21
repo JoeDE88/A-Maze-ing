@@ -9,7 +9,7 @@ default_config: ConfigModel = {
     "HEIGHT": 10,
     "ENTRY": (0,0),
     "EXIT": (0,0),
-    "OUTPUT_FILE": "default_output.txt",
+    "OUTPUT_FILE": "default_output_maze.txt",
     "PERFECT": True
 }
 
