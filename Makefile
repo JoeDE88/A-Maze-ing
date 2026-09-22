@@ -8,7 +8,8 @@ install:
 
 unpack:
 	tar -xvf mlx-2.2.tgz
-	unzip ubuntu/mlx-2.2-py3-none-any.whl
+	uv pip install ubuntu/mlx-2.2-py3-none-any.whl
+	rm -rf ubuntu fedora src mlx-2.2.dist-info
 
 run:
 	uv run a_maze_ing.py config.txt
@@ -17,7 +18,6 @@ debug:
 	uv run python3 -m pdb a_maze_ing.py config.txt
 
 clean:
-	rm -rf ubuntu fedora src mlx-2.2.dist-info
 	find . -type d \( -name .git -o -name .venv \) -prune -o -type d -iname '*cache*' -print -exec rm -rf {} +
 
 lint:

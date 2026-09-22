@@ -2,6 +2,17 @@ import sys
 import random
 from typing_extensions import TypedDict, NotRequired
 from dotenv import dotenv_values
+from collections import OrderedDict
+
+
+class ConfigModel(TypedDict):
+    WIDTH: int
+    HEIGHT: int
+    ENTRY: tuple[int, int]
+    EXIT: tuple[int, int]
+    OUTPUT_FILE: str
+    PERFECT: bool
+    SEED: NotRequired[str | None]
 
 
 default_config: ConfigModel = {
@@ -13,15 +24,6 @@ default_config: ConfigModel = {
     "PERFECT": True
 }
 
-
-class ConfigModel(TypedDict):
-    WIDTH: int
-    HEIGHT: int
-    ENTRY: tuple[int, int]
-    EXIT: tuple[int, int]
-    OUTPUT_FILE: str
-    PERFECT: bool
-    SEED: NotRequired[str | None]
 
 
 keys_list: set[str] = {
@@ -77,6 +79,12 @@ def parse_bool(value: str) -> bool:
         raise Exception("PERFECT must be True or False")
 
 
+def check_values(env: dict[str, str | None]) -> None:
+    for key, value in env.items():
+        if value == None:
+            raise Exception("Configuration file must contain 'KEY=VALUE' lines")
+
+
 def check_config() -> ConfigModel:
     if len(sys.argv) != 2:
         raise Exception("Number of arguments has to be 2.\n"
@@ -86,6 +94,7 @@ def check_config() -> ConfigModel:
         diff = set(keys_list).difference(env.keys())
         if diff:
             raise Exception(f"{sys.argv[1]} file has missing keys: {list(diff)}")
+        check_values(env)
         assert isinstance(env["ENTRY"], str)
         assert isinstance(env["EXIT"], str)
         assert isinstance(env["PERFECT"], str)
@@ -106,7 +115,11 @@ def check_config() -> ConfigModel:
         if p.errno == 13:
             print(f"Error: cant' access {sys.argv[1]}")
     except Exception as e:
-        print(f"ERROR ON YOUR {sys.argv[1]}:")
-        print(e)
-        print(f"Creating a maze with default configuration:")
+        print(f"ERROR ON YOUR {sys.argv[1]} FILE:")
+        print(f" {e}")
+        print(f"\033[91m Creating a maze with default configuration\033[00m")
     return default_config
+
+if __name__ == "__main__":
+    env = dotenv_values(sys.argv[1])
+    print(env)

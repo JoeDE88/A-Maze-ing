@@ -1,10 +1,4 @@
 [flake8]
 exclude =
     .venv,
-    .git,
-    __pycache__,
-    mlx-2.2,
-    mlx_CLXV,
-    build,
-    dist,
-    *.egg-info
+    mlx/,
