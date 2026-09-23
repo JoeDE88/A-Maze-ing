@@ -16,15 +16,21 @@ class ImgData:
 
 
 class MLXVar:
-    cell_size: int = 20
+    cell_size: int = 25
 
-    wall_palette: list[tuple[int, int, int]] = [
-        (180, 180, 180),
-        (255, 120, 80),
-        (120, 200, 255),
-        (120, 255, 150),
-        (255, 215, 90),
-        (200, 120, 255),
+    palette: list[tuple[int, int, int]] = [
+        (random.randint(30, 255),
+         random.randint(30, 255),
+         random.randint(30, 255)),
+        (random.randint(30, 255),
+         random.randint(30, 255),
+         random.randint(30, 255)),
+        (random.randint(30, 255),
+         random.randint(30, 255),
+         random.randint(30, 255)),
+        (random.randint(30, 255),
+         random.randint(30, 255),
+         random.randint(30, 255)),
     ]
 
     def __init__(self, maze: MazeGenerator) -> None:
@@ -39,7 +45,7 @@ class MLXVar:
 
         self.show_solution: bool = False
         self.wall_color_idx: int = 0
-        self.solution_cells: set[tuple[int, int]] = self.compute_solution_cells()
+        self.solution_cells: set[tuple[int, int]] = self.find_solution_cells()
 
     def put_pixel_to_img(self, img: ImgData,
                          x: int, y: int, color: int) -> None:
@@ -86,10 +92,10 @@ class MLXVar:
     def draw_cell(self, img: ImgData, cell: Cell, x: int, y: int) -> None:
         path_col = (0, 0, 0)
         solution_col = (90, 190, 255)
-        base = self.wall_palette[self.wall_color_idx]
-        jitter = random.randint(-25, 25)
+        base = self.palette[self.wall_color_idx]
+        jitter = random.randint(-50, 50)
         walls_col = tuple(max(0, min(255, c + jitter)) for c in base)
-        ft_col = (200, 125, 23)
+        ft_col = (237, 52, 145)
         entry_col = (6, 183, 56)
         exit_col = (23, 12, 240)
         if cell.untouchable:
@@ -119,10 +125,6 @@ class MLXVar:
         del param
         self.mlx.mlx_loop_exit(self.mlx_ptr)
 
-    # SE LLAMA CUANDO EL SISTEMA "EXPONE" LA VENTANA DE NUEVO
-    # (redimensionar, minimizar/restaurar, taparla con otra ventana...).
-    # No hace falta recalcular nada: la imagen ya dibujada en self.img_1
-    # sigue intacta, solo hay que volver a "pegarla" en la ventana.
     def on_expose(self, param: None) -> None:
         assert isinstance(self.mlx, Mlx)
         assert isinstance(self.img_1, ImgData)
@@ -131,9 +133,7 @@ class MLXVar:
             self.mlx_ptr, self.win_1, self.img_1.img, 20, 20)
         self.draw_menu_text()
 
-    # FUNCIÓN AUXILIAR PARA CALCULAR LAS CELDAS DEL CAMINO SOLUCIÓN
-    # A PARTIR DE LA ENTRADA Y LA SECUENCIA DE DIRECCIONES self.maze.solution
-    def compute_solution_cells(self) -> set[tuple[int, int]]:
+    def find_solution_cells(self) -> set[tuple[int, int]]:
         cells: set[tuple[int, int]] = {self.maze.entry}
         x, y = self.maze.entry
         for direction in self.maze.solution:
@@ -144,49 +144,44 @@ class MLXVar:
 
     def toggle_solution(self) -> None:
         self.show_solution = not self.show_solution
-        state = "visible" if self.show_solution else "escondido"
-        print(f"[A-Maze-ing] Camino solución: {state}.")
+        state = "visible" if self.show_solution else "hidden"
+        print(f"[A-Maze-ing] Solution path: {state}.")
         self.redraw()
 
     def rotate_wall_color(self) -> None:
-        self.wall_color_idx = (self.wall_color_idx + 1) % len(self.wall_palette)
-        print(f"[A-Maze-ing] Color de paredes #{self.wall_color_idx + 1}.")
+        self.wall_color_idx = (self.wall_color_idx + 1) % len(self.palette)
+        print(f"[A-Maze-ing] Walls color #{self.wall_color_idx + 1}.")
         self.redraw()
 
     def regenerate_maze(self) -> None:
-        print("[A-Maze-ing] Regenerando laberinto...")
+        print("[A-Maze-ing] Regenerating maze...")
         try:
             new_maze = MazeGenerator()
             new_maze.gen_maze()
             new_maze.solve()
         except Exception as e:
-            print(f"[A-Maze-ing] error al regenerar: {e}")
+            print(f"[A-Maze-ing] error while regenerating: {e}")
             return
         self.maze = new_maze
-        self.solution_cells = self.compute_solution_cells()
-        print(f"[DEBUG] nueva solucion: {new_maze.solution}")  # TEMPORAL
+        self.solution_cells = self.find_solution_cells()
+        print(f"[DEBUG] new solution: {new_maze.solution}")
         self.redraw()
 
-    # DIBUJA EL TEXTO DEL MENÚ DIRECTAMENTE SOBRE LA VENTANA (no sobre la
-    # imagen del laberinto), en el margen inferior reservado para ello.
-    # mlx_string_put pinta directo en la ventana, así que hay que volver a
-    # llamarlo cada vez que se repinta la ventana (redraw / expose / inicio).
     def draw_menu_text(self) -> None:
         assert isinstance(self.mlx, Mlx)
         text_color = self.put_pixel(255, 255, 255)
         base_y = 20 + self.maze.height * self.cell_size + 10
         lines = [
-            "1: regen",
-            "2: path",
-            "3: color",
-            "4: salir",
+            "1: Regenerate maze",
+            "2: Show/Hide solution",
+            "3: Change color",
+            "4: Quit",
         ]
         for i, line in enumerate(lines):
             self.mlx.mlx_string_put(
                 self.mlx_ptr, self.win_1, 20, base_y + i * 15,
                 text_color, line)
 
-    # VUELVE A DIBUJAR TODAS LAS CELDAS DEL LABERINTO ACTUAL Y REFRESCA LA VENTANA
     def redraw(self) -> None:
         assert isinstance(self.mlx, Mlx)
         assert isinstance(self.img_1, ImgData)
@@ -252,12 +247,12 @@ class MLXVar:
         self.mlx.mlx_hook(self.win_1, 33, 0, self.close_mini, None)
         self.mlx.mlx_expose_hook(self.win_1, self.on_expose, None)
 
-        print("\n=== A-Maze-ing ===")
-        print("1. Regenerar un nuevo laberinto")
-        print("2. Mostrar / esconder el camino solución")
-        print("3. Rotar el color de las paredes")
-        print("4. Salir (también con 'q')")
-        print("(la ventana debe tener el foco para recibir las teclas)\n")
+        # print("\n=== A-Maze-ing ===")
+        # print("1. Regenerar un nuevo laberinto")
+        # print("2. Mostrar / esconder el camino solución")
+        # print("3. Rotar el color de las paredes")
+        # print("4. Salir (también con 'q')")
+        # print("(la ventana debe tener el foco para recibir las teclas)\n")
 
         self.mlx.mlx_loop(self.mlx_ptr)
 
