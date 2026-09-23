@@ -2,7 +2,6 @@ import sys
 import random
 from typing_extensions import TypedDict, NotRequired
 from dotenv import dotenv_values
-from collections import OrderedDict
 
 
 class ConfigModel(TypedDict):
@@ -18,8 +17,8 @@ class ConfigModel(TypedDict):
 default_config: ConfigModel = {
     "WIDTH": 10,
     "HEIGHT": 10,
-    "ENTRY": (0,0),
-    "EXIT": (0,0),
+    "ENTRY": (0, 0),
+    "EXIT": (9, 9),
     "OUTPUT_FILE": "default_output_maze.txt",
     "PERFECT": True
 }
@@ -79,9 +78,9 @@ def parse_bool(value: str) -> bool:
 
 
 def check_values(env: dict[str, str | None]) -> None:
-    for key, value in env.items():
-        if value == None:
-            raise Exception("Configuration file must contain 'KEY=VALUE' lines")
+    for value in env.items():
+        if value is None:
+            raise Exception("Config file must contain 'KEY=VALUE' lines")
 
 
 def check_config() -> ConfigModel:
@@ -92,7 +91,8 @@ def check_config() -> ConfigModel:
         env = dotenv_values(sys.argv[1])
         diff = set(keys_list).difference(env.keys())
         if diff:
-            raise Exception(f"{sys.argv[1]} file has missing keys: {list(diff)}")
+            raise Exception(f"{sys.argv[1]} file has missing keys: "
+                            f"{list(diff)}")
         check_values(env)
         assert isinstance(env["ENTRY"], str)
         assert isinstance(env["EXIT"], str)
@@ -116,11 +116,7 @@ def check_config() -> ConfigModel:
     except Exception as e:
         print(f"ERROR ON YOUR {sys.argv[1]} FILE:")
         print(f" {e}")
-        print(f"\033[91m Creating a maze with a default configuration:\033[00m")
+        print("\033[91m Creating a maze with a default configuration:\033[00m")
         for key, value in default_config.items():
             print(f" {key}={value}")
     return default_config
-
-if __name__ == "__main__":
-    env = dotenv_values(sys.argv[1])
-    print(env)
