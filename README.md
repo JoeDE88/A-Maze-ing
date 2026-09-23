@@ -1,10 +1,10 @@
-*This project was built as part of the 42 curriculum by jdiaz-ec and gblas-he.*
+*This project has been created as part of the 42 curriculum by jdiaz-ec and gblas-he.*
 
 # A-Maze-ing
 
 > This is the way
 
-## What it is
+## Description
 
 A-Maze-ing is a maze generator written in Python. You give it a config file,
 it builds a maze on a rectangular grid, finds the shortest path from the entry
@@ -24,7 +24,7 @@ Either way, the maze always has a **"42"** pattern drawn into it, made of cells
 that stay completely closed and are never touched. If the grid is too small to
 fit the pattern, we print a warning and skip it instead of crashing.
 
-## How to run it
+## Instructions
 
 ### What you need
 
@@ -236,10 +236,13 @@ it got committed. We didn't keep anything we couldn't explain.
 
 ## Team & project management
 
-*(Still to be filled in by the team.)*
+* **Team members and roles**:
 
-- **Team members and roles**: jdiaz-ec, gblas-he
-- **Planning**: the initial plan, and how it changed as the project went on.
-- **What worked well / what we'd improve**.
-- **Tools we used**: `uv` for dependency management, `mypy`/`flake8` for
-  static checking, git branches + PR workflow, and so on.
+  * **jdiaz-ec**: worked on the maze generation and the path between the entry and exit.
+  * **gblas-he**: worked on the visual part, including the MLX window, colours and user interaction.
+
+* **Planning**: We divided the project into two main parts: maze generation and visualisation. We worked on them separately at first and then integrated both parts and fixed the problems that appeared.
+
+* **What worked well / what we'd improve**: Dividing the work helped us work faster and focus on our parts. We could have planned the integration between both parts better from the beginning.
+
+* **Tools we used**: Python, MiniLibX, Git, uv, mypy, flake8 and pdb.
