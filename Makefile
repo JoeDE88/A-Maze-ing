@@ -16,7 +16,7 @@ run:
 	python3 a_maze_ing.py config.txt
 
 debug:
-	uv run python3 -m pdb src/amazeing/a_maze_ing.py config.txt
+	uv run python3 -m pdb src/mazegen/a_maze_ing.py config.txt
 
 clean:
 	find . -type d \( -name .git -o -name .venv \) -prune -o -type d -iname '*cache*' -print -exec rm -rf {} +

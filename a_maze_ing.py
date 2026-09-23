@@ -1,5 +1,5 @@
-from amazeing import MazeGenerator
-from amazeing.maze_visuals import MLXVar
+from mazegen import MazeGenerator
+from mazegen.maze_visuals import MLXVar
 
 if __name__ == "__main__":
     try:
