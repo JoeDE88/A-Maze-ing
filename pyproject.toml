@@ -1,7 +1,6 @@
 [project]
-name = "github-amazeing"
+name = "amazeing"
 version = "0.1.0"
-description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.14"
 dependencies = [
@@ -10,6 +9,13 @@ dependencies = [
     "mypy>=2.3.1",
     "numpy>=2.5.3",
 ]
+
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
 
 [tool.mypy]
 exclude = [
