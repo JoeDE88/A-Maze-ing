@@ -1,7 +1,7 @@
 from mlx import Mlx
 from typing import Any, cast
 import random
-from maze_generator import MazeGenerator, Cell, Directions
+from .maze_generator import MazeGenerator, Cell, Directions
 
 
 class ImgData:
@@ -18,7 +18,6 @@ class ImgData:
 class MLXVar:
     cell_size: int = 30
 
-    # PALETA DE COLORES DISPONIBLES PARA LAS PAREDES (SE ROTA CON LA TECLA '3')
     wall_palette: list[tuple[int, int, int]] = [
         (180, 180, 180),
         (255, 120, 80),
@@ -37,7 +36,6 @@ class MLXVar:
         self.win_1: Any | None = None
         self.img_1: ImgData | None = None
 
-        # -- ESTADO DEL MENÚ INTERACTIVO --
         self.show_solution: bool = False
         self.wall_color_idx: int = 0
         self.solution_cells: set[tuple[int, int]] = \
@@ -106,11 +104,6 @@ class MLXVar:
             self.put_square(img, x, y, path_col)
         self.draw_wall(img, x, y, cell.walls, walls_col)
 
-    # TECLAS DEL MENÚ INTERACTIVO:
-    #   1 -> regenerar un nuevo laberinto
-    #   2 -> mostrar / esconder el camino solución
-    #   3 -> rotar el color de las paredes
-    #   4 o q -> salir
     def press_key(self, keynum: int, param: Any) -> None:
         if keynum in (113, 52):
             self.close_mini(param)
@@ -126,8 +119,6 @@ class MLXVar:
         del param
         self.mlx.mlx_loop_exit(self.mlx_ptr)
 
-    # FUNCIÓN AUXILIAR PARA CALCULAR LAS CELDAS DEL CAMINO SOLUCIÓN
-    # A PARTIR DE LA ENTRADA Y LA SECUENCIA DE DIRECCIONES self.maze.solution
     def compute_solution_cells(self) -> set[tuple[int, int]]:
         cells: set[tuple[int, int]] = {self.maze.entry}
         x, y = self.maze.entry
@@ -137,21 +128,18 @@ class MLXVar:
             cells.add((x, y))
         return cells
 
-    # OPCIÓN 2 DEL MENÚ: MOSTRAR / ESCONDER LA SOLUCIÓN
     def toggle_solution(self) -> None:
         self.show_solution = not self.show_solution
         state = "visible" if self.show_solution else "escondido"
         print(f"[A-Maze-ing] Camino solución: {state}.")
         self.redraw()
 
-    # OPCIÓN 3 DEL MENÚ: ROTAR EL COLOR DE LAS PAREDES
     def rotate_wall_color(self) -> None:
         self.wall_color_idx = (self.wall_color_idx + 1) \
             % len(self.wall_palette)
         print(f"[A-Maze-ing] Color de paredes #{self.wall_color_idx + 1}.")
         self.redraw()
 
-    # OPCIÓN 1 DEL MENÚ: REGENERAR UN LABERINTO NUEVO
     def regenerate_maze(self) -> None:
         print("[A-Maze-ing] Regenerando laberinto...")
         try:
@@ -165,7 +153,6 @@ class MLXVar:
         self.solution_cells = self.compute_solution_cells()
         self.redraw()
 
-    # VUELVE A DIBUJAR EL LABERINTO ACTUAL Y REFRESCA LA VENTANA
     def redraw(self) -> None:
         assert isinstance(self.mlx, Mlx)
         assert isinstance(self.img_1, ImgData)

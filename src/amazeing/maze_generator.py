@@ -1,5 +1,5 @@
 import numpy as np
-from conf_validator import check_config, ConfigModel
+from .conf_validator import check_config, ConfigModel
 from enum import Enum
 from typing import cast, Any
 import random
@@ -13,7 +13,6 @@ class Directions(Enum):
     W = (0, -1)
 
 
-# PAREDES EXISTENTES POR CADA CELDA, EN BINARIO:
 class Walls(Enum):
     N = 0b1110
     E = 0b1101
@@ -21,7 +20,6 @@ class Walls(Enum):
     W = 0b0111
 
 
-# CELDAS
 class Cell():
     def __init__(self, x: int, y: int,
                  visited: bool = False, untouchable: bool = False) -> None:
@@ -30,12 +28,10 @@ class Cell():
         self.untouchable: bool = bool(untouchable)
         self.walls: int = 0b1111
 
-    # FUNCIÓN PARA ABRIR PARED DESDE CELDA ACTUAL
     def open_wall(self, direction: str) -> None:
         wall = Walls[direction].value
         self.walls &= wall
 
-    # FUNCIÓN PARA ABRIR PARED DESDE CELDA VECINA
     def open_opposite(self, direction: str) -> None:
         if direction == 'N' or direction == 'S':
             opp_direction = Walls[direction].value ^ 0b0101
@@ -69,7 +65,6 @@ class MazeGenerator():
             if self.get_cell(pos[0], pos[1]).untouchable:
                 raise Exception(f"{name} can't be inside the '42' pattern")
 
-    # FUNCIÓN PARA VERIFICAR QUE LE 42 CABE DENTRO DEL MAZE
     def check_fortytwo(self) -> None:
         if self.width < 9 or self.height < 7:
             raise Exception("Maze size is too small to print '42'")
@@ -90,17 +85,14 @@ class MazeGenerator():
                 y += 1
             x += 1
 
-    # FUNCIÓN PARA INSTANCIAR UNA CELDA POR CADA POSICIÓN DEL ARRAY self.grid
     def populate_grid(self) -> None:
         for x in range(self.height):
             for y in range(self.width):
                 self.grid[x][y] = Cell(x, y)
 
-    # FUNCIÓN PARA OBTENER LA CELDA SEGÚN POSICIÓN x, y
     def get_cell(self, x: int, y: int) -> Cell:
         return cast(Cell, self.grid[x][y])
 
-    # FUNCIÓN PARA OBTENER LAS CELDAS DE LAS 4 ESQUINAS CON 3 PAREDES
     def get_corners(self) -> list[Cell]:
         corners = []
         if self.get_cell(0, 0).walls in self.one_walls:
@@ -114,7 +106,6 @@ class MazeGenerator():
             corners.append(self.get_cell(self.height - 1, self.width - 1))
         return corners
 
-    # FUNCIÓN PARA ABRIR LAS PAREDES DE LAS CELDAS DE LAS ESQUINAS
     def open_corners(self) -> None:
         corners = self.get_corners()
         for i in range(len(corners)):
@@ -137,7 +128,6 @@ class MazeGenerator():
                     cell.open_wall(new_dir.name)
                     ncell.open_opposite(new_dir.name)
 
-    # FUNCIÓN PARA ABRIR CUALQUIER CELDA QUE TENGA 3 PAREDES
     def open_dead_ends(self) -> None:
         for x in range(self.height):
             for y in range(self.width):
@@ -163,12 +153,6 @@ class MazeGenerator():
                                 ncell.open_opposite(new_dir.name)
                                 break
 
-    ###########################################################################
-    #       AQUÌ EMPIEZAN LAS FUNCIONES PARA GENERAR EL MAZE                 #
-    #       ALGORITMO: HUNT & KILL                                           #
-    ###########################################################################
-
-    # FUNCIÓN PRINCIPAL DEL ALGORITMO
     def gen_maze(self) -> None:
         pos: tuple[int, int] = self.entry
         x2, y2 = pos
@@ -185,13 +169,6 @@ class MazeGenerator():
             self.open_corners()
             self.open_dead_ends()
 
-    # PRIMERA PARTE DEL ALGORITMO:
-    # se empieza desde la entrada, aleatoriamente elige una dirección
-    # para moverse de celda y verifica que:
-    # esté dentro de los limites
-    # que la siguiente celda no haya ya sido visitada,
-    # que la siguiente celda no sea parte de las que forman el 42
-    # si todo esto pasa, abre las paredes de ambas
     def walk(self, x: int, y: int) \
             -> tuple[int, int]:
         directions = list(Directions)
@@ -217,7 +194,6 @@ class MazeGenerator():
                     return (nx, ny)
         return (-1, -1)
 
-    # FUNCIÓN AUXILIAR DE hunt() PARA ENCONTRAR CELDAS VECINAS YA VISITADAS
     def find_neighbors(self, x: int, y: int) -> list[Directions]:
         existing_neighbors: list[Directions] = []
         if x > 0 and self.get_cell(x - 1, y).visited and \
@@ -234,9 +210,6 @@ class MazeGenerator():
             existing_neighbors.append(Directions.S)
         return existing_neighbors
 
-    # SEGUNDA PARTE DEL ALGORITMO
-    # recorre la grid buscando la primera celda no visitada; si tiene una
-    # celda vecina ya visitada, abre las paredes entre ambas
     def hunt(self, x: int, y: int) \
             -> tuple[int, int]:
         for x in range(self.height):
@@ -256,10 +229,6 @@ class MazeGenerator():
                 return (x, y)
         return (-1, -1)
 
-    ###########################################################################
-    #       AQUÌ EMPIEZAN LAS FUNCIONES PARA ENCONTRAR EL CAMINO              #
-    #       ALGORITMO: DIJKSTRA                                              #
-    ###########################################################################
     def possible_directions(self, x: int, y: int) -> list[tuple[int, int]]:
         cell = self.get_cell(x, y)
         directions: list[tuple[int, int]] = []
@@ -273,7 +242,6 @@ class MazeGenerator():
             directions.append(Directions['W'].value)
         return directions
 
-    # FUNCIÓN PRINCIPAL
     def dijkstra(self) -> list[str] | None:
         start = list(self.entry)
         end = list(self.exit)
@@ -360,10 +328,6 @@ class MazeGenerator():
             solution[i] = Walls(opp_direction).name
         self.solution = solution[::-1]
 
-    # FUNCION QUE GENERA EL FILE output_maze.txt CON LA INFO DE:
-    # LAS PAREDES
-    # ENTRADA, SALIDA
-    # CAMINO PARA LA SALIDA
     def gen_output(self) -> None:
         with open(self.output, "w") as file:
             x = 0
