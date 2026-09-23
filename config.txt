@@ -4,4 +4,4 @@ ENTRY=0,3
 EXIT=19,19
 OUTPUT_FILE=output_maze.txt
 PERFECT=False
-SEED="aas"
+SEED=""
