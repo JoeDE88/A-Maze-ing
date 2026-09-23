@@ -16,7 +16,7 @@ class ImgData:
 
 
 class MLXVar:
-    cell_size: int = 30
+    cell_size: int = 20
 
     wall_palette: list[tuple[int, int, int]] = [
         (180, 180, 180),
@@ -32,14 +32,14 @@ class MLXVar:
         self.mlx_ptr: int = 0
         self.maze: MazeGenerator = maze
         self.screen_w: int = maze.width * self.cell_size + 40
-        self.screen_h: int = maze.height * self.cell_size + 90
+        self.screen_h: int = maze.height * self.cell_size + 120
         self.win_1: Any | None = None
+        self.win_2 = None
         self.img_1: ImgData | None = None
 
         self.show_solution: bool = False
         self.wall_color_idx: int = 0
-        self.solution_cells: set[tuple[int, int]] = \
-            self.compute_solution_cells()
+        self.solution_cells: set[tuple[int, int]] = self.compute_solution_cells()
 
     def put_pixel_to_img(self, img: ImgData,
                          x: int, y: int, color: int) -> None:
@@ -119,6 +119,20 @@ class MLXVar:
         del param
         self.mlx.mlx_loop_exit(self.mlx_ptr)
 
+    # SE LLAMA CUANDO EL SISTEMA "EXPONE" LA VENTANA DE NUEVO
+    # (redimensionar, minimizar/restaurar, taparla con otra ventana...).
+    # No hace falta recalcular nada: la imagen ya dibujada en self.img_1
+    # sigue intacta, solo hay que volver a "pegarla" en la ventana.
+    def on_expose(self, param: None) -> None:
+        assert isinstance(self.mlx, Mlx)
+        assert isinstance(self.img_1, ImgData)
+        del param
+        self.mlx.mlx_put_image_to_window(
+            self.mlx_ptr, self.win_1, self.img_1.img, 20, 20)
+        self.draw_menu_text()
+
+    # FUNCIÓN AUXILIAR PARA CALCULAR LAS CELDAS DEL CAMINO SOLUCIÓN
+    # A PARTIR DE LA ENTRADA Y LA SECUENCIA DE DIRECCIONES self.maze.solution
     def compute_solution_cells(self) -> set[tuple[int, int]]:
         cells: set[tuple[int, int]] = {self.maze.entry}
         x, y = self.maze.entry
@@ -135,8 +149,7 @@ class MLXVar:
         self.redraw()
 
     def rotate_wall_color(self) -> None:
-        self.wall_color_idx = (self.wall_color_idx + 1) \
-            % len(self.wall_palette)
+        self.wall_color_idx = (self.wall_color_idx + 1) % len(self.wall_palette)
         print(f"[A-Maze-ing] Color de paredes #{self.wall_color_idx + 1}.")
         self.redraw()
 
@@ -151,8 +164,29 @@ class MLXVar:
             return
         self.maze = new_maze
         self.solution_cells = self.compute_solution_cells()
+        print(f"[DEBUG] nueva solucion: {new_maze.solution}")  # TEMPORAL
         self.redraw()
 
+    # DIBUJA EL TEXTO DEL MENÚ DIRECTAMENTE SOBRE LA VENTANA (no sobre la
+    # imagen del laberinto), en el margen inferior reservado para ello.
+    # mlx_string_put pinta directo en la ventana, así que hay que volver a
+    # llamarlo cada vez que se repinta la ventana (redraw / expose / inicio).
+    def draw_menu_text(self) -> None:
+        assert isinstance(self.mlx, Mlx)
+        text_color = self.put_pixel(255, 255, 255)
+        base_y = 20 + self.maze.height * self.cell_size + 10
+        lines = [
+            "1: regen",
+            "2: path",
+            "3: color",
+            "4: salir",
+        ]
+        for i, line in enumerate(lines):
+            self.mlx.mlx_string_put(
+                self.mlx_ptr, self.win_1, 20, base_y + i * 15,
+                text_color, line)
+
+    # VUELVE A DIBUJAR TODAS LAS CELDAS DEL LABERINTO ACTUAL Y REFRESCA LA VENTANA
     def redraw(self) -> None:
         assert isinstance(self.mlx, Mlx)
         assert isinstance(self.img_1, ImgData)
@@ -170,6 +204,7 @@ class MLXVar:
             self.img_1.img,
             20,
             20)
+        self.draw_menu_text()
 
     def renderize(self) -> None:
         self.mlx = Mlx()
@@ -212,9 +247,10 @@ class MLXVar:
             self.img_1.img,
             20,
             20)
-
+        self.draw_menu_text()
         self.mlx.mlx_key_hook(self.win_1, self.press_key, None)
         self.mlx.mlx_hook(self.win_1, 33, 0, self.close_mini, None)
+        self.mlx.mlx_expose_hook(self.win_1, self.on_expose, None)
 
         print("\n=== A-Maze-ing ===")
         print("1. Regenerar un nuevo laberinto")
