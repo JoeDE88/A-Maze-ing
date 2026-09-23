@@ -2,8 +2,6 @@
 
 # A-Maze-ing
 
-> This is the way
-
 ## Description
 
 **A-Maze-ing** is a Python maze generator. Given a configuration file, it builds a
@@ -14,7 +12,7 @@ graphically through a MiniLibX (MLX) window.
 The maze can be generated in two modes, controlled by the `PERFECT` flag of the
 configuration file:
 
-- **`PERFECT=True`**: a perfect maze — exactly one path between the entry and the
+- **`PERFECT=True`**: a perfect maze — just one path between the entry and the
   exit, no loops at all (a classic "lab" maze).
 - **`PERFECT=False`** (default): a **playable, Pac-Man-like board** — fully
   connected, with the four corners and the centre open, at least two independent
@@ -31,7 +29,7 @@ it — otherwise a warning is printed and the pattern is skipped).
 - Python 3.14+
 - The dependencies listed in `requirements.txt`
 - A working MiniLibX (MLX) Python binding (`mlx` module) for the graphical
-  display — unpacked with `make unpack`
+  display — installed with `make unpack`
 
 ### Installation
 
@@ -124,8 +122,7 @@ exit as a sequence of `N`/`E`/`S`/`W` letters.
 
 ## Maze generation algorithm
 
-The maze is generated with the **Hunt & Kill** algorithm (`maze_gen.py`,
-`MazeGenerator.gen_maze`):
+The maze is generated with an improved version of **Hunt & Kill** algorithm:
 
 1. **Walk**: starting from the entry cell, randomly walk to an unvisited
    neighbour, carving a passage (opening the two matching walls) as it goes,
@@ -142,22 +139,24 @@ has a single opening, so that the maze gets the loops and connectivity required
 by a Pac-Man-style board instead of staying a perfect (single-path) maze.
 
 **Why Hunt & Kill?** It is simple to reason about and to implement correctly
-(no external stack/union-find structure needed beyond the grid itself), it
-naturally produces long, winding corridors with comparatively few dead-ends
+, it naturally produces long, winding corridors with comparatively few dead-ends
 once combined with the corner/dead-end-opening passes, and it keeps the "carve
 a passage between two neighbouring cells" operation local, which made it easy
 to guarantee wall coherence between neighbouring cells and to keep the "42"
 pattern cells untouched (`untouchable` cells are simply skipped as neighbours).
+It was improved by remembering the last position of the hunting part.
 
-The shortest path (used for the output file and the "show solution" menu
-option) is computed separately with **Dijkstra's algorithm** (`dijkstra()` /
-`get_solution()`), walking the open walls of the maze as a graph.
+
+## Maze solver algorithm
+The shortest path between entry point and exit point is computed separately with **Dijkstra's algorithm** walking the open walls of the maze as a graph.
+
+Djikstra’s Algorithm give always an optimal solution based on a **Bread-First-Search** and queues.
+The working of Dijkstra’s algorithm follows a greedy approach. It always picks the node with the smallest known distance and expands from there.
 
 ## Reusable module
 
 The maze generation logic lives entirely in `maze_gen.py`, inside the
-`MazeGenerator` class, and has no dependency on the display code
-(`maze_visuals.py`). It can be imported and reused in another project.
+`MazeGenerator` class. It can be imported and reused in another project.
 
 ### Basic usage
 
@@ -179,38 +178,9 @@ print(maze.solution)          # e.g. ['E', 'E', 'S', ...]
 ### Custom parameters (size, seed, entry/exit, ...)
 
 All parameters (`WIDTH`, `HEIGHT`, `ENTRY`, `EXIT`, `OUTPUT_FILE`, `PERFECT`,
-optionally `SEED`) come from the configuration file passed as `sys.argv[1]`
-(validated by `conf_validator.check_config`). To reuse the generator with
-different parameters, write/point to a different configuration file — for
-example, generate one on the fly:
+optionally `SEED`) come from the configuration file passed as `sys.argv[1]`.
+To reuse the generator with different parameters, write/point to a different configuration file.
 
-```python
-import sys
-
-with open("custom_config.txt", "w") as f:
-    f.write("WIDTH=15\nHEIGHT=15\nENTRY=0,0\nEXIT=14,14\n"
-            "OUTPUT_FILE=out.txt\nPERFECT=False\nSEED=1234\n")
-
-sys.argv = [sys.argv[0], "custom_config.txt"]
-
-from maze_gen import MazeGenerator
-maze = MazeGenerator()
-maze.gen_maze()
-```
-
-### Accessing the generated structure and the solution
-
-- `maze.grid` — a 2D `numpy` array of `Cell` objects (`grid[x][y]`), each with:
-  - `cell.pos`: `(x, y)` coordinates
-  - `cell.walls`: an `int` from `0` to `15`, bit-encoding closed walls (see the
-    Output File Format table above)
-  - `cell.untouchable`: `True` for cells belonging to the "42" pattern
-- `maze.entry`, `maze.exit`: the entry/exit coordinates
-- `maze.solution`: after calling `maze.solve()`, the list of `N`/`E`/`S`/`W`
-  letters describing the shortest path from entry to exit
-- `maze.gen_output()`: writes the maze to `maze.output` (`OUTPUT_FILE`) using
-  the hexadecimal wall format described above — this is *not* the same format
-  as `maze.grid`, which stores richer `Cell` objects rather than raw digits.
 
 ### Packaging
 
@@ -221,10 +191,9 @@ display and CLI parts of this repository.
 
 ## Resources
 
-- [Maze generation algorithms — Wikipedia](https://en.wikipedia.org/wiki/Maze_generation_algorithm)
-- [Buckblog: "Maze Generation: Hunt-and-Kill algorithm"](https://weblog.jamisbuck.org/2011/1/24/maze-generation-hunt-and-kill-algorithm) — reference for the Hunt & Kill algorithm implemented in `maze_gen.py`
+- [Maze generation algorithms](https://en.wikipedia.org/wiki/Maze_generation_algorithm)
+- [Buckblog: "Maze Generation: Hunt-and-Kill algorithm"](https://weblog.jamisbuck.org/2011/1/24/maze-generation-hunt-and-kill-algorithm) — reference for the Hunt & Kill algorithm implemented.
 - [Dijkstra's algorithm — Wikipedia](https://en.wikipedia.org/wiki/Dijkstra%27s_algorithm) — used for the shortest-path solver
-- [Python `typing` module documentation](https://docs.python.org/3/library/typing.html) — used for the type hints required by `mypy`
 - [42 MiniLibX documentation](https://harm-smits.github.io/42docs/libs/minilibx) — used for the graphical display
 
 ### AI usage
@@ -240,8 +209,6 @@ All AI-generated code was read, understood, and adapted by the team before
 being committed; nothing was used without being able to explain how it works.
 
 ## Team & project management
-
-*(To be filled in by the team.)*
 
 - **Team members and roles**: jdiaz-ec, gblas-he
 - **Planning**: initial plan, and how it evolved through the project.
