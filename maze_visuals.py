@@ -189,7 +189,7 @@ class MLXVar:
             "1: regen",
             "2: path",
             "3: color",
-            "4/q: salir",
+            "4: salir",
         ]
         for i, line in enumerate(lines):
             self.mlx.mlx_string_put(
