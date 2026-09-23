@@ -13,7 +13,7 @@ unpack:
 	rm src/mlx_CLXV-2.2.tgz
 
 run:
-	uv run src/amazeing/a_maze_ing.py config.txt
+	python3 a_maze_ing.py config.txt
 
 debug:
 	uv run python3 -m pdb src/amazeing/a_maze_ing.py config.txt
