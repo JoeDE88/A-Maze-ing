@@ -85,8 +85,7 @@ def check_values(env: dict[str, str | None]) -> None:
 
 def check_config() -> ConfigModel:
     if len(sys.argv) != 2:
-        raise Exception("Number of arguments has to be 2.\n"
-                        f"Example of usage: ./{sys.argv[0]} config.txt")
+        raise Exception(f"Example of usage: ./{sys.argv[0]} config.txt")
     try:
         env = dotenv_values(sys.argv[1])
         diff = set(keys_list).difference(env.keys())

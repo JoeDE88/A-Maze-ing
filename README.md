@@ -12,12 +12,9 @@ MiniLibX (MLX) window.
 
 There are two modes, depending on the `PERFECT` flag in the config:
 
-- **`PERFECT=True`** — a proper perfect maze. One single path from entry to
-  exit, zero loops, the classic "lab" maze look.
-- **`PERFECT=False`** (the default) — a playable board, Pac-Man style.
-  Everything is connected, the four corners and the centre are open, there
-  are at least two independent routes between entry and exit (so there are
-  loops), and dead-ends are kept to a minimum.
+- **`PERFECT=True`** — a proper perfect maze with one single path from entry to
+  exit.
+- **`PERFECT=False`** — a playable board, Pac-Man style. Everything is connected, the four corners and the centre are open, there are at least two independent routes between entry and exit (so there are loops), and dead-ends are kept to a minimum.
 
 Either way, the maze always has a **"42"** pattern drawn into it, made of cells
 that stay completely closed and are never touched. If the grid is too small to
@@ -30,7 +27,7 @@ fit the pattern, we print a warning and skip it instead of crashing.
 - Python 3.14+
 - Whatever is listed in `requirements.txt`
 - A working MiniLibX (MLX) Python binding (the `mlx` module) for the graphical
-  part — unpack it with `make unpack`
+  part — install it with `make unpack`
 
 ### Install
 
@@ -54,8 +51,7 @@ make run
 
 - `a_maze_ing.py` is the mandatory entry point.
 - `config.txt` (or whatever filename you pass as the only argument) is a
-  plain-text config file — format is described below. There's a default
-  `config.txt` sitting at the root of the repo.
+  plain-text config file.
 
 If you want to debug the main script with `pdb`:
 
@@ -90,9 +86,6 @@ Once the MLX window opens, you can use these keys (the window needs focus):
 | `2` | Show / hide the shortest path between entry and exit |
 | `3` | Rotate the wall colour palette |
 | `4` or `q` | Quit and close the window |
-
-The same list of options is printed to the terminal when the window opens,
-so you don't have to memorise it.
 
 ## Config file format
 
@@ -132,7 +125,7 @@ We used an improved version of the **Hunt & Kill** algorithm:
    at least one visited neighbour, carve a passage between them, and start
    walking again from there.
 3. Repeat steps 1–2 until every reachable cell has been visited.
-4. The improvement is remembering the last hunting position and keep hunting from there, instead of starting the hunt every time from the (0,0) point.
+4. The improvement is remembering the last hunting position and when the next hunt occurs, it goes from there, instead of starting the hunt every time from the (0,0) point.
 
 When `PERFECT=False`, we run two extra passes afterwards: `open_corners()`
 opens one extra wall on each of the four "dead-end" corners, and
@@ -141,8 +134,7 @@ single opening. That's what gives the maze the loops and connectivity a
 Pac-Man-style board needs, instead of leaving it as a perfect single-path maze.
 
 **Why Hunt & Kill?** A few reasons. It's easy to reason about and to implement
-correctly — you don't need an external stack or union-find structure beyond the
-grid itself. It naturally produces long, winding corridors with relatively few
+correctly. It naturally produces long, winding corridors with relatively few
 dead-ends, especially once you add the corner/dead-end-opening passes. And it
 keeps the "carve a passage between two neighbouring cells" step local, which
 made it much easier to keep wall coherence between neighbours and to leave the
@@ -193,12 +185,12 @@ parts of this repo.
 
 - [Maze generation algorithms — Wikipedia](https://en.wikipedia.org/wiki/Maze_generation_algorithm)
 - [Buckblog: "Maze Generation: Hunt-and-Kill algorithm"](https://weblog.jamisbuck.org/2011/1/24/maze-generation-hunt-and-kill-algorithm)
-- [Dijkstra's algorithm — Wikipedia]
+- [Dijkstra's algorithm ](https://wiki.zahno.dev/days-of-algo/content/notebooks/010-maze-solver-dijkstra.html)
 - [42 MiniLibX docs](https://harm-smits.github.io/42docs/libs/minilibx) — for the graphical display
 
 ### AI usage
 
-We used AI assistance during the project.
+We used AI assistance during the project to help us understand better the algorithms.
 Every bit of AI-generated code was read, understood, and adapted by us before
 it got committed. We didn't keep anything we couldn't explain.
 
@@ -206,11 +198,11 @@ it got committed. We didn't keep anything we couldn't explain.
 
 * **Team members and roles**:
 
-  * **jdiaz-ec**: worked on the maze generation and the path between the entry and exit.
+  * **jdiaz-ec**: worked on the maze generation algorithm and the maze solver algorithm.
   * **gblas-he**: worked on the visual part, including the MLX window, colours and user interaction.
 
 * **Planning**: We divided the project into two main parts: maze generation and visualisation. We worked on them separately at first and then integrated both parts and fixed the problems that appeared.
 
 * **What worked well / what we'd improve**: Dividing the work helped us work faster and focus on our parts. We could have planned the integration between both parts better from the beginning.
 
-* **Tools we used**: Python, MiniLibX, Git, uv, mypy, flake8 and pdb.
+* **Tools we used**: Python, MiniLibX, Git, uv, mypy, flake8.

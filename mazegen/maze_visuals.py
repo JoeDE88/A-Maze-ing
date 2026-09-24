@@ -145,7 +145,9 @@ class MLXVar:
     def toggle_solution(self) -> None:
         self.show_solution = not self.show_solution
         state = "visible" if self.show_solution else "hidden"
-        print(f"[A-Maze-ing] Solution path: {state}.")
+        if state == "visible":
+            print(f"[A-Maze-ing] Solution path: {self.maze.solution}")
+
         self.redraw()
 
     def rotate_wall_color(self) -> None:
@@ -164,7 +166,6 @@ class MLXVar:
             return
         self.maze = new_maze
         self.solution_cells = self.find_solution_cells()
-        print(f"[DEBUG] new solution: {new_maze.solution}")
         self.redraw()
 
     def draw_menu_text(self) -> None:
@@ -246,13 +247,6 @@ class MLXVar:
         self.mlx.mlx_key_hook(self.win_1, self.press_key, None)
         self.mlx.mlx_hook(self.win_1, 33, 0, self.close_mini, None)
         self.mlx.mlx_expose_hook(self.win_1, self.on_expose, None)
-
-        # print("\n=== A-Maze-ing ===")
-        # print("1. Regenerar un nuevo laberinto")
-        # print("2. Mostrar / esconder el camino solución")
-        # print("3. Rotar el color de las paredes")
-        # print("4. Salir (también con 'q')")
-        # print("(la ventana debe tener el foco para recibir las teclas)\n")
 
         self.mlx.mlx_loop(self.mlx_ptr)
 
