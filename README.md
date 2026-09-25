@@ -122,10 +122,12 @@ Once the MLX window opens, you can use these keys (the window needs focus):
 
 ### Output file format
 
-Row by row, one hex digit per cell. Each digit encodes the closed walls of that
+After the maze is created and after found the shortest path from `ENTRY` to `EXIT`,
+the maze is written in an output file:
+Row by row, one hexadecimal digit per cell. Each digit encodes the closed walls of that
 cell (bit 0 = North, bit 1 = East, bit 2 = South, bit 3 = West — a set bit means
-the wall is closed). After a blank line, three more lines come: entry
-coordinates, exit coordinates, and the shortest path from entry to exit as a
+the wall is closed). After a blank line, three more lines come: `ENTRY`
+coordinates, `EXIT` coordinates, and the shortest path from entry to exit as a
 string of `N`/`E`/`S`/`W` letters.
 
 ## How the maze is generated
