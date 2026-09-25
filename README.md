@@ -24,70 +24,36 @@ fit the pattern, we print a warning and skip it instead of crashing.
 
 ### What you need
 
-- Python 3.14+
-- Whatever is listed in `requirements.txt`
-- A working MiniLibX (MLX) Python binding (the `mlx` module) for the graphical
-  part — install it with `make unpack`
+1. A virtual environment with Python 3.14+ installed
+2. Project dependencies listed in `requirements.txt` or `pyproject.toml`
+3. A working MiniLibX (MLX) Python binding (the `mlx` module) for the graphical
+  part
+4. The config file
 
-### Install
+### 1. Virtual environment
 
-```bash
-make install
-```
-
-This pulls in the Python dependencies (through `uv`/`pip`).
-
-### Run
+Since the project was created with [Uv](https://docs.astral.sh/uv/), an extremely fast Python project and package manager, we recommend creating a virtual enviroment with uv, so that we can also install the python version needed for this project:
 
 ```bash
-python3 a_maze_ing.py config.txt
+make venv # uv venv .venv --python 3.14
 ```
 
-Or through the Makefile:
+### 2. Install dependencies
+
+This pulls in the projects dependencies:
 
 ```bash
-make run
+make install # uv pip install -r requirements.txt
 ```
 
-- `a_maze_ing.py` is the mandatory entry point.
-- `config.txt` (or whatever filename you pass as the only argument) is a
-  plain-text config file.
+### 3. Install Minilibx (Non-Obligatory)
 
-If you want to debug the main script with `pdb`:
+This installs Minilibx module from `mlx-2.2-py3-none-any.whl`:
 
 ```bash
-make debug
+make install_mlx # uv pip install mlx-2.2-py3-none-any.whl
 ```
-
-For linting (`flake8` + `mypy`):
-
-```bash
-make lint           # the mandatory flags
-make lint-strict    # mypy --strict, optional but recommended
-```
-
-To clean up generated/cache files:
-
-```bash
-make clean
-```
-
-The program should never crash on bad input. Config errors, out-of-bounds
-coordinates, an impossible "42" pattern — all of that is caught and printed
-as a clean `error: ...` line on the console instead of a traceback.
-
-### Playing with the maze (menu)
-
-Once the MLX window opens, you can use these keys (the window needs focus):
-
-| Key | What it does |
-|-----|--------------|
-| `1` | Regenerate a brand-new maze and redraw it |
-| `2` | Show / hide the shortest path between entry and exit |
-| `3` | Rotate the wall colour palette |
-| `4` or `q` | Quit and close the window |
-
-## Config file format
+### 4. Config file format
 
 One `KEY=VALUE` pair per line. Lines starting with `#` are comments and get
 ignored.
@@ -105,6 +71,54 @@ ignored.
 All six mandatory keys need to be there. If one is missing, or the entry/exit
 is out of bounds, or `ENTRY == EXIT`, we treat it as a config error and exit
 cleanly.
+
+#### A config.txt was included in the repository, feel free to use or modify it.
+
+## Run the script
+
+
+```bash
+make run # uv run python3 a_maze_ing.py config.txt
+```
+
+- `a_maze_ing.py` is the mandatory entry point.
+- `config.txt` (or whatever filename you pass as the only argument) is a
+  plain-text config file.
+<br/>
+<br/>
+
+If you want to debug the main script with `pdb`:
+
+```bash
+make debug # uv run python3 -m pdb a_maze_ing.py config.txt
+```
+
+For linting (`flake8` + `mypy`):
+
+```bash
+make lint           # uv run mypy . --warn-return-any --warn-unused-ignores --ignore-missing-import --disallow-untyped-defs --check-untyped-defs
+# flake8 .
+make lint-strict    # mypy --strict, optional but recommended
+```
+
+To clean up generated/cache files:
+
+```bash
+make clean
+```
+## If Minilibx installed
+### Playing with the maze (menu)
+
+Once the MLX window opens, you can use these keys (the window needs focus):
+
+| Key | What it does |
+|-----|--------------|
+| `1` | Regenerate a brand-new maze and redraw it |
+| `2` | Show / hide the shortest path between entry and exit |
+| `3` | Rotate the wall colour palette |
+| `4` or `q` | Quit and close the window |
+
+
 
 ### Output file format
 
