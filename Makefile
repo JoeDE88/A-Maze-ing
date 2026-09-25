@@ -25,4 +25,4 @@ lint:
 lint-strict:
 	uv run mypy . --strict
 
-.PHONY: all clean re
+.PHONY: clean
