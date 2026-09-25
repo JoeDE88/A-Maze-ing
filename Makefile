@@ -6,11 +6,8 @@ $(VENV):
 install:
 	uv pip install -r requirements.txt
 
-unpack:
-	tar -xvf mlx-2.2.tgz
-	uv pip install ubuntu/mlx-2.2-py3-none-any.whl
-	rm -rf ubuntu fedora mlx-2.2.dist-info
-	rm src/mlx_CLXV-2.2.tgz
+install_mlx:
+	uv pip install mlx-2.2-py3-none-any.whl
 
 run:
 	python3 a_maze_ing.py config.txt
