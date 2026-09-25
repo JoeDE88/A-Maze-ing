@@ -78,9 +78,9 @@ def parse_bool(value: str) -> bool:
 
 
 def check_values(env: dict[str, str | None]) -> None:
-    for value in env.items():
+    for key, value in env.items():
         if value is None:
-            raise Exception("Config file must contain 'KEY=VALUE' lines")
+            raise Exception(f"Config file must contain 'KEY=VALUE' lines: on '{key}'")
 
 
 def check_config() -> ConfigModel:
@@ -88,6 +88,7 @@ def check_config() -> ConfigModel:
         raise Exception(f"Example of usage: ./{sys.argv[0]} config.txt")
     try:
         env = dotenv_values(sys.argv[1])
+        print(f"env: {env}")
         diff = set(keys_list).difference(env.keys())
         if diff:
             raise Exception(f"{sys.argv[1]} file has missing keys: "
@@ -119,3 +120,6 @@ def check_config() -> ConfigModel:
         for key, value in default_config.items():
             print(f" {key}={value}")
     return default_config
+
+if __name__ == "__main__":
+    check_config()
