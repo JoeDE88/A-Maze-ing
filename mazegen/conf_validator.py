@@ -87,8 +87,7 @@ def check_config() -> ConfigModel:
     if len(sys.argv) != 2:
         raise Exception(f"Example of usage: ./{sys.argv[0]} config.txt")
     try:
-        env = dotenv_values(sys.argv[1])
-        print(f"env: {env}")
+        env: dict[str, str | None] = dotenv_values(sys.argv[1])
         diff = set(keys_list).difference(env.keys())
         if diff:
             raise Exception(f"{sys.argv[1]} file has missing keys: "
@@ -120,6 +119,3 @@ def check_config() -> ConfigModel:
         for key, value in default_config.items():
             print(f" {key}={value}")
     return default_config
-
-if __name__ == "__main__":
-    check_config()
