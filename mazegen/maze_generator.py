@@ -1,3 +1,4 @@
+from .custom_exceptions import FortyTwoShapeError, DoorInFortyTwoError
 import numpy as np
 from .conf_validator import check_config, ConfigModel
 from enum import Enum
@@ -59,15 +60,15 @@ class MazeGenerator():
         self.output: str = config["OUTPUT_FILE"]
         try:
             self.check_fortytwo()
-        except Exception as e:
+        except FortyTwoShapeError as e:
             print(e)
         for name, pos in (("ENTRY", self.entry), ("EXIT", self.exit)):
             if self.get_cell(pos[0], pos[1]).untouchable:
-                raise Exception(f"{name} can't be inside the '42' pattern")
+                raise DoorInFortyTwoError(name)
 
     def check_fortytwo(self) -> None:
         if self.width < 9 or self.height < 7:
-            raise Exception("Maze size is too small to print '42'")
+            raise FortyTwoShapeError()
         start_point: tuple[int, int] = (self.center[0] - 2, self.center[1] - 3)
         fortytwo = [
             [1, 0, 0, 0, 1, 1, 1],

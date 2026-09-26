@@ -1,5 +1,6 @@
 from mazegen import MazeGenerator
 from mazegen.maze_visuals import MLXVar
+from mazegen import CustomException
 
 if __name__ == "__main__":
     try:
@@ -12,5 +13,12 @@ if __name__ == "__main__":
 
         m.gen_output()
 
+    except PermissionError as p:
+        if p.errno == 13:
+            print(p)
+
+    except CustomException as c:
+        print(f"{c}")
+
     except Exception as e:
-        print(f"error: {e}")
+        print(f"{e}")
