@@ -23,7 +23,10 @@ class Walls(Enum):
 
 class Cell():
     def __init__(self, x: int, y: int,
-                 visited: bool = False, untouchable: bool = False) -> None:
+                 visited: bool = False,
+                 untouchable:
+                 bool = False
+                 ) -> None:
         self.pos: tuple[int, int] = (x, y)
         self.visited: bool = bool(visited)
         self.untouchable: bool = bool(untouchable)
@@ -51,9 +54,10 @@ class MazeGenerator():
         self.entry: tuple[int, int] = config["ENTRY"]
         self.exit: tuple[int, int] = config["EXIT"]
         self.perfect: bool = config["PERFECT"]
-        self.grid: np.ndarray[Any, np.dtype[Any]] = np.empty((self.height,
-                                                             self.width),
-                                                             dtype=object)
+        self.grid: np.ndarray[Any, np.dtype[Any]] = np.empty(
+            (self.height,
+             self.width),
+            dtype=object)
         self.one_walls: list[int] = [0b0111, 0b1011, 0b1101, 0b1110]
         self.populate_grid()
         self.solution: list[str] = []
@@ -95,17 +99,17 @@ class MazeGenerator():
         return cast(Cell, self.grid[x][y])
 
     def get_corners(self) -> list[Cell]:
-        corners = []
-        if self.get_cell(0, 0).walls in self.one_walls:
-            corners.append(self.get_cell(0, 0))
-        if self.get_cell(0, self.width - 1).walls in self.one_walls:
-            corners.append(self.get_cell(0, self.width - 1))
-        if self.get_cell(self.height - 1, 0).walls in self.one_walls:
-            corners.append(self.get_cell(self.height - 1, 0))
-        if self.get_cell(self.height - 1,
-                         self.width - 1).walls in self.one_walls:
-            corners.append(self.get_cell(self.height - 1, self.width - 1))
-        return corners
+        corners = [
+            (0, 0),
+            (0, self.width - 1),
+            (self.height - 1, 0),
+            (self.height - 1, self.width - 1)
+            ]
+        one_wall_corners: list[Cell] = []
+        for corner in corners:
+            if self.get_cell(*corner).walls in self.one_walls:
+                one_wall_corners.append(self.get_cell(*corner))
+        return one_wall_corners
 
     def open_corners(self) -> None:
         corners = self.get_corners()
