@@ -143,10 +143,6 @@ class MLXVar:
 
     def toggle_solution(self) -> None:
         self.show_solution = not self.show_solution
-        state = "visible" if self.show_solution else "hidden"
-        if state == "visible":
-            print(f"[A-Maze-ing] Solution path: {self.maze.solution}")
-
         self.redraw()
 
     def rotate_wall_color(self) -> None:
