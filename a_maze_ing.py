@@ -9,7 +9,7 @@ if __name__ == "__main__":
         m.solve()
 
         xvar = MLXVar(m)
-        xvar.renderize()
+        xvar.run()
 
         m.gen_output()
 

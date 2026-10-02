@@ -1,14 +1,17 @@
 from mlx import Mlx
-from typing import Any, cast
+from typing import Any
 import random
 from .maze_generator import MazeGenerator, Cell, Directions
+from .drawing_utils import rgba_to_int32, put_pixel, draw_square, draw_wall
 
 
 class ImgData:
     def __init__(self) -> None:
         self.img = None
-        self.width = 0
-        self.height = 0
+        self.w = 0
+        self.h = 0
+        self.pos_x = 0
+        self.pos_y = 0
         self.data = None
         self.sl = 0
         self.bpp = 0
@@ -16,8 +19,10 @@ class ImgData:
 
 
 class MLXVar:
+    # Default cell size
     cell_size: int = 25
 
+    # Color palette for cell walls
     palette: list[tuple[int, int, int]] = [
         (random.randint(30, 255),
          random.randint(30, 255),
@@ -34,59 +39,37 @@ class MLXVar:
     ]
 
     def __init__(self, maze: MazeGenerator) -> None:
-        self.mlx: Mlx | None = None
-        self.mlx_ptr: int = 0
         self.maze: MazeGenerator = maze
-        self.screen_w: int = maze.width * self.cell_size + 40
-        self.screen_h: int = maze.height * self.cell_size + 120
-        self.win_1: Any | None = None
-        self.img_1: ImgData | None = None
-
+        self.mlx: Mlx = Mlx()
+        self.mlx_ptr: int = self.mlx.mlx_init()
+        self.imgs_w: int = self.maze.w * self.cell_size
+        self.img_conf: ImgData = self.create_img(self.imgs_w,
+                                                 60,
+                                                 20,
+                                                 20)
+        self.img_maze: ImgData = self.create_img(self.imgs_w,
+                                                 self.maze.h * self.cell_size,
+                                                 20,
+                                                 (self.img_conf.h +
+                                                  self.img_conf.pos_y))
+        self.img_menu: ImgData = self.create_img(self.imgs_w,
+                                                 100,
+                                                 20,
+                                                 (self.img_conf.h +
+                                                  self.img_maze.h +
+                                                  40))
+        self.screen_w: int = self.img_maze.w + 40
+        self.screen_h: int = (self.img_maze.h +
+                              self.img_conf.h +
+                              self.img_menu.h +
+                              40)
+        self.win_1: Any = self.mlx.mlx_new_window(self.mlx_ptr,
+                                                  self.screen_w,
+                                                  self.screen_h,
+                                                  "A_Maze_Ing")
         self.show_solution: bool = False
         self.wall_color_idx: int = 0
         self.solution_cells: set[tuple[int, int]] = self.find_solution_cells()
-
-    def put_pixel_to_img(self, img: ImgData,
-                         x: int, y: int, color: int) -> None:
-        if not (0 <= x < img.width and 0 <= y < img.height):
-            return
-        bytes_per_pixel = img.bpp // 8
-        offset = y * img.sl + x * bytes_per_pixel
-        data = cast(memoryview, img.data)
-        data[offset:offset + bytes_per_pixel] = color.to_bytes(4, 'little')
-
-    def put_pixel(self, r: int, g: int, b: int, a: int = 255) -> int:
-        return (a << 24) | (r << 16) | (g << 8) | b
-
-    def draw_wall(self, img: ImgData, x: int, y: int,
-                  walls: int, rgb: tuple[int, ...]) -> None:
-        thickness = 2
-        color = self.put_pixel(*rgb)
-        if (walls & 1):
-            for t in range(thickness):
-                for dx in range(self.cell_size):
-                    self.put_pixel_to_img(img, x + dx, y + t, color)
-        if (walls & 2):
-            for t in range(thickness):
-                for dy in range(self.cell_size):
-                    self.put_pixel_to_img(img, x + self.cell_size - 1 - t,
-                                          y + dy, color)
-        if (walls & 4):
-            for t in range(thickness):
-                for dx in range(self.cell_size):
-                    self.put_pixel_to_img(img, x + dx,
-                                          y + self.cell_size - 1 - t, color)
-        if (walls & 8):
-            for t in range(thickness):
-                for dy in range(self.cell_size):
-                    self.put_pixel_to_img(img, x + t, y + dy, color)
-
-    def put_square(self, img: ImgData,
-                   x: int, y: int, rgb: tuple[int, ...]) -> None:
-        color = self.put_pixel(*rgb)
-        for dx in range(self.cell_size):
-            for dy in range(self.cell_size):
-                self.put_pixel_to_img(img, x + dx, y + dy, color)
 
     def draw_cell(self, img: ImgData, cell: Cell, x: int, y: int) -> None:
         path_col = (0, 0, 0)
@@ -98,16 +81,16 @@ class MLXVar:
         entry_col = (6, 183, 56)
         exit_col = (23, 12, 240)
         if cell.untouchable:
-            self.put_square(img, x, y, ft_col)
+            draw_square(img, self.cell_size, x, y, ft_col)
         elif cell.pos == self.maze.entry:
-            self.put_square(img, x + 5, y + 5, entry_col)
+            draw_square(img, self.cell_size, x + 5, y + 5, entry_col)
         elif cell.pos == self.maze.exit:
-            self.put_square(img, x, y, exit_col)
+            draw_square(img, self.cell_size, x, y, exit_col)
         elif self.show_solution and cell.pos in self.solution_cells:
-            self.put_square(img, x, y, solution_col)
+            draw_square(img, self.cell_size, x, y, solution_col)
         else:
-            self.put_square(img, x, y, path_col)
-        self.draw_wall(img, x, y, cell.walls, walls_col)
+            draw_square(img, self.cell_size, x, y, path_col)
+        draw_wall(img, self.cell_size, x, y, cell.walls, walls_col)
 
     def press_key(self, keynum: int, param: Any) -> None:
         if keynum in (113, 52):
@@ -120,17 +103,8 @@ class MLXVar:
             self.rotate_wall_color()
 
     def close_mini(self, param: None) -> None:
-        assert isinstance(self.mlx, Mlx)
         del param
         self.mlx.mlx_loop_exit(self.mlx_ptr)
-
-    def on_expose(self, param: None) -> None:
-        assert isinstance(self.mlx, Mlx)
-        assert isinstance(self.img_1, ImgData)
-        del param
-        self.mlx.mlx_put_image_to_window(
-            self.mlx_ptr, self.win_1, self.img_1.img, 20, 20)
-        self.draw_menu_text()
 
     def find_solution_cells(self) -> set[tuple[int, int]]:
         cells: set[tuple[int, int]] = {self.maze.entry}
@@ -163,10 +137,14 @@ class MLXVar:
         self.solution_cells = self.find_solution_cells()
         self.redraw()
 
+    def fill_img(self, img: ImgData, color: int) -> None:
+        for y in range(img.h):
+            for x in range(img.w):
+                put_pixel(img, x, y, color)
+
     def draw_menu_text(self) -> None:
-        assert isinstance(self.mlx, Mlx)
-        text_color = self.put_pixel(255, 255, 255)
-        base_y = 20 + self.maze.height * self.cell_size + 10
+        text_color = rgba_to_int32(255, 255, 255)
+        base_y = self.img_menu.pos_y
         lines = [
             "1: Regenerate maze",
             "2: Show/Hide solution",
@@ -175,76 +153,128 @@ class MLXVar:
         ]
         for i, line in enumerate(lines):
             self.mlx.mlx_string_put(
-                self.mlx_ptr, self.win_1, 20, base_y + i * 15,
+                self.mlx_ptr, self.win_1, 20, base_y + i * 20,
                 text_color, line)
 
+    def draw_config_text(self) -> None:
+        config_color = rgba_to_int32(255, 255, 255)
+        first_col_x = self.img_conf.pos_x
+        first_col_y = self.img_conf.pos_y
+        second_col_x = self.img_conf.pos_x + 100
+        second_col_y = self.img_conf.pos_y
+        first_col = [
+            f"{self.maze.w}",
+            f"{self.maze.entry}",
+            f"{self.maze.perfect}"
+        ]
+        second_col = [
+            f"{self.maze.h}",
+            f"{self.maze.exit}",
+        ]
+        if self.maze.seed:
+            second_col.append(f"{self.maze.seed}")
+        else:
+            second_col.append(f"''")
+
+        for i, line in enumerate(first_col):
+            self.mlx.mlx_string_put(self.mlx_ptr,
+                                self.win_1,
+                                first_col_x,
+                                first_col_y + i * 20,
+                                config_color,
+                                line)
+
     def redraw(self) -> None:
-        assert isinstance(self.mlx, Mlx)
-        assert isinstance(self.img_1, ImgData)
-        for x in range(self.maze.height):
-            for y in range(self.maze.width):
+        for x in range(self.maze.h):
+            for y in range(self.maze.w):
                 cell: Cell = self.maze.get_cell(x, y)
                 self.draw_cell(
-                    self.img_1,
+                    self.img_maze,
                     cell,
                     y * self.cell_size,
                     x * self.cell_size)
         self.mlx.mlx_put_image_to_window(
             self.mlx_ptr,
             self.win_1,
-            self.img_1.img,
-            20,
-            20)
-        self.draw_menu_text()
-
-    def renderize(self) -> None:
-        self.mlx = Mlx()
-        self.mlx_ptr = self.mlx.mlx_init()
-
-        self.win_1 = self.mlx.mlx_new_window(
-            self.mlx_ptr,
-            self.screen_w,
-            self.screen_h,
-            "A_Maze_Ing"
+            self.img_maze.img,
+            self.img_maze.pos_x,
+            self.img_maze.pos_y
         )
 
-        self.img_1 = ImgData()
-        self.img_1.width = self.maze.width * self.cell_size
-        self.img_1.height = self.maze.height * self.cell_size
-        self.img_1.img = self.mlx.mlx_new_image(
-                       self.mlx_ptr,
-                       self.img_1.width,
-                       self.img_1.height)
+    def create_img(self, w: int, h: int, pos_x: int, pos_y: int) -> ImgData:
+        img = ImgData()
+        img.w = w
+        img.h = h
+        img.pos_x = pos_x
+        img.pos_y = pos_y
+        img.img = self.mlx.mlx_new_image(
+                        self.mlx_ptr,
+                        img.w,
+                        img.h)
 
-        (self.img_1.data,
-         self.img_1.bpp,
-         self.img_1.sl,
-         self.img_1.iformat
-         ) = self.mlx.mlx_get_data_addr(
-            self.img_1.img)
+        (img.data,
+         img.bpp,
+         img.sl,
+         img.iformat
+         ) = self.mlx.mlx_get_data_addr(img.img)
 
-        for x in range(self.maze.height):
-            for y in range(self.maze.width):
+        return img
+
+    def on_expose(self, param: None) -> None:
+        del param
+        self.renderize()
+
+    def clean_resources(self) -> None:
+        self.mlx.mlx_destroy_image(self.mlx_ptr, self.img_conf.img)
+        self.mlx.mlx_destroy_image(self.mlx_ptr, self.img_maze.img)
+        self.mlx.mlx_destroy_image(self.mlx_ptr, self.img_menu.img)
+        self.mlx.mlx_destroy_window(self.mlx_ptr, self.win_1)
+        self.mlx.mlx_release(self.mlx_ptr)
+
+    def declare_hooks(self) -> None:
+        self.mlx.mlx_expose_hook(self.win_1, self.on_expose, None)
+        self.mlx.mlx_key_hook(self.win_1, self.press_key, None)
+        self.mlx.mlx_hook(self.win_1, 33, 0, self.close_mini, None)
+
+    def run(self) -> None:
+        self.declare_hooks()
+        for x in range(self.maze.h):
+            for y in range(self.maze.w):
                 cell: Cell = self.maze.get_cell(x, y)
                 self.draw_cell(
-                    self.img_1,
+                    self.img_maze,
                     cell,
                     y * self.cell_size,
                     x * self.cell_size)
+        self.fill_img(self.img_conf, 0xFF000000)
+        self.fill_img(self.img_menu, 0xFF000000)
+        self.renderize()
+        self.mlx.mlx_loop(self.mlx_ptr)
+        self.clean_resources()
+
+    def renderize(self) -> None:
+        self.mlx.mlx_clear_window(self.mlx_ptr, self.win_1)
+        self.mlx.mlx_put_image_to_window(
+            self.mlx_ptr,
+            self.win_1,
+            self.img_conf.img,
+            self.img_conf.pos_x,
+            self.img_conf.pos_y)
 
         self.mlx.mlx_put_image_to_window(
             self.mlx_ptr,
             self.win_1,
-            self.img_1.img,
-            20,
-            20)
+            self.img_maze.img,
+            self.img_maze.pos_x,
+            self.img_maze.pos_y)
+
+        # menu
+        self.mlx.mlx_put_image_to_window(
+            self.mlx_ptr,
+            self.win_1,
+            self.img_menu.img,
+            self.img_menu.pos_x,
+            self.img_menu.pos_y)
+
         self.draw_menu_text()
-        self.mlx.mlx_key_hook(self.win_1, self.press_key, None)
-        self.mlx.mlx_hook(self.win_1, 33, 0, self.close_mini, None)
-        self.mlx.mlx_expose_hook(self.win_1, self.on_expose, None)
-
-        self.mlx.mlx_loop(self.mlx_ptr)
-
-        self.mlx.mlx_destroy_image(self.mlx_ptr, self.img_1.img)
-        self.mlx.mlx_destroy_window(self.mlx_ptr, self.win_1)
-        self.mlx.mlx_release(self.mlx_ptr)
+        self.draw_config_text()

@@ -48,20 +48,21 @@ class MazeGenerator():
 
     def __init__(self) -> None:
         config: ConfigModel = check_config()
-        self.width: int = config["WIDTH"]
-        self.height: int = config["HEIGHT"]
-        self.center: tuple[int, int] = (self.height // 2, self.width // 2)
+        self.w: int = config["WIDTH"]
+        self.h: int = config["HEIGHT"]
+        self.center: tuple[int, int] = (self.h // 2, self.w // 2)
         self.entry: tuple[int, int] = config["ENTRY"]
         self.exit: tuple[int, int] = config["EXIT"]
         self.perfect: bool = config["PERFECT"]
         self.grid: np.ndarray[Any, np.dtype[Any]] = np.empty(
-            (self.height,
-             self.width),
+            (self.h,
+             self.w),
             dtype=object)
         self.one_walls: list[int] = [0b0111, 0b1011, 0b1101, 0b1110]
         self.populate_grid()
         self.solution: list[str] = []
         self.output: str = config["OUTPUT_FILE"]
+        self.seed = config.get("SEED")
         try:
             self.check_fortytwo()
         except FortyTwoShapeError as e:
@@ -71,7 +72,7 @@ class MazeGenerator():
                 raise DoorInFortyTwoError(name)
 
     def check_fortytwo(self) -> None:
-        if self.width < 9 or self.height < 7:
+        if self.w < 9 or self.h < 7:
             raise FortyTwoShapeError()
         start_point: tuple[int, int] = (self.center[0] - 2, self.center[1] - 3)
         fortytwo = [
@@ -91,8 +92,8 @@ class MazeGenerator():
             x += 1
 
     def populate_grid(self) -> None:
-        for x in range(self.height):
-            for y in range(self.width):
+        for x in range(self.h):
+            for y in range(self.w):
                 self.grid[x][y] = Cell(x, y)
 
     def get_cell(self, x: int, y: int) -> Cell:
@@ -101,9 +102,9 @@ class MazeGenerator():
     def get_corners(self) -> list[Cell]:
         corners = [
             (0, 0),
-            (0, self.width - 1),
-            (self.height - 1, 0),
-            (self.height - 1, self.width - 1)
+            (0, self.w - 1),
+            (self.h - 1, 0),
+            (self.h - 1, self.w - 1)
             ]
         one_wall_corners: list[Cell] = []
         for corner in corners:
@@ -125,8 +126,8 @@ class MazeGenerator():
                        [
                         nx >= 0,
                         ny >= 0,
-                        ny < self.width,
-                        nx < self.height
+                        ny < self.w,
+                        nx < self.h
                         ]
                         ):
                     ncell = self.get_cell(nx, ny)
@@ -134,8 +135,8 @@ class MazeGenerator():
                     ncell.open_opposite(new_dir.name)
 
     def open_dead_ends(self) -> None:
-        for x in range(self.height):
-            for y in range(self.width):
+        for x in range(self.h):
+            for y in range(self.w):
                 cell: Cell = self.get_cell(x, y)
                 if cell.walls in self.one_walls:
                     path = Walls(cell.walls).name
@@ -148,8 +149,8 @@ class MazeGenerator():
                         if all(
                                [nx >= 0,
                                 ny >= 0,
-                                ny < self.width,
-                                nx < self.height
+                                ny < self.w,
+                                nx < self.h
                                 ]
                                 ):
                             if not self.get_cell(nx, ny).untouchable:
@@ -187,8 +188,8 @@ class MazeGenerator():
                    [
                     nx >= 0,
                     ny >= 0,
-                    ny < self.width,
-                    nx < self.height
+                    ny < self.w,
+                    nx < self.h
                     ]
                     ):
                 n_cell: Cell = self.get_cell(nx, ny)
@@ -207,18 +208,18 @@ class MazeGenerator():
         if y > 0 and self.get_cell(x, y - 1).visited and \
            not self.get_cell(x, y - 1).untouchable:
             existing_neighbors.append(Directions.W)
-        if y + 1 < self.width and self.get_cell(x, y + 1).visited and \
+        if y + 1 < self.w and self.get_cell(x, y + 1).visited and \
            not self.get_cell(x, y + 1).untouchable:
             existing_neighbors.append(Directions.E)
-        if x + 1 < self.height and self.get_cell(x + 1, y).visited and \
+        if x + 1 < self.h and self.get_cell(x + 1, y).visited and \
            not self.get_cell(x + 1, y).untouchable:
             existing_neighbors.append(Directions.S)
         return existing_neighbors
 
     def hunt(self, x: int, y: int) \
             -> tuple[int, int]:
-        for x in range(self.height):
-            for y in range(self.width):
+        for x in range(self.h):
+            for y in range(self.w):
                 cell: Cell = self.get_cell(x, y)
                 if cell.visited or cell.untouchable:
                     continue
@@ -251,8 +252,8 @@ class MazeGenerator():
         start = list(self.entry)
         end = list(self.exit)
         solution: list[list[int | list[int]]] = []
-        visited = [[False for _ in range(self.width)]
-                   for _ in range(self.height)]
+        visited = [[False for _ in range(self.w)]
+                   for _ in range(self.h)]
         visited[start[0]][start[1]] = True
         queue: list[list[int | list[int]]] = []
 
@@ -273,8 +274,8 @@ class MazeGenerator():
                 x = cell[0] + open_dir[i][0]
                 y = cell[1] + open_dir[i][1]
 
-                if (((x >= 0) and (x < self.height)
-                   and (y >= 0) and (y < self.width))
+                if (((x >= 0) and (x < self.h)
+                   and (y >= 0) and (y < self.w))
                    and not visited[x][y]):
                     if not self.get_cell(x, y).untouchable:
                         visited[x][y] = True
@@ -336,12 +337,12 @@ class MazeGenerator():
     def gen_output(self) -> None:
         with open(self.output, "w") as file:
             x = 0
-            for x in range(self.height):
+            for x in range(self.h):
                 y = 0
-                for y in range(self.width):
+                for y in range(self.w):
                     file.write(f"{self.get_cell(x, y).walls:x}")
                     y += 1
-                    if y == self.width:
+                    if y == self.w:
                         file.write("\n")
                 x += 1
             file.write("\n")
