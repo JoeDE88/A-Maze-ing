@@ -42,23 +42,27 @@ class MLXVar:
         self.maze: MazeGenerator = maze
         self.mlx: Mlx = Mlx()
         self.mlx_ptr: int = self.mlx.mlx_init()
+        self.pos_x: int = 20
         self.imgs_w: int = self.maze.w * self.cell_size
         self.img_conf: ImgData = self.create_img(self.imgs_w,
-                                                 60,
-                                                 20,
+                                                 80,
+                                                 self.pos_x,
                                                  20)
         self.img_maze: ImgData = self.create_img(self.imgs_w,
                                                  self.maze.h * self.cell_size,
-                                                 20,
+                                                 self.pos_x,
                                                  (self.img_conf.h +
                                                   self.img_conf.pos_y))
         self.img_menu: ImgData = self.create_img(self.imgs_w,
                                                  100,
-                                                 20,
+                                                 self.pos_x,
                                                  (self.img_conf.h +
                                                   self.img_maze.h +
                                                   40))
         self.screen_w: int = self.img_maze.w + 40
+        if self.screen_w < 415:
+            self.screen_w = 415
+            self.img_maze.pos_x = (self.screen_w - self.img_maze.w) // 2
         self.screen_h: int = (self.img_maze.h +
                               self.img_conf.h +
                               self.img_menu.h +
@@ -149,7 +153,7 @@ class MLXVar:
             "1: Regenerate maze",
             "2: Show/Hide solution",
             "3: Change color",
-            "4: Quit",
+            "4 or q: Quit",
         ]
         for i, line in enumerate(lines):
             self.mlx.mlx_string_put(
@@ -162,27 +166,65 @@ class MLXVar:
         first_col_y = self.img_conf.pos_y
         second_col_x = self.img_conf.pos_x + 100
         second_col_y = self.img_conf.pos_y
+        third_col_x = self.img_conf.pos_x + 200
+        third_col_y = self.img_conf.pos_y
+        fourth_col_x = self.img_conf.pos_x + 300
+        fourth_col_y = self.img_conf.pos_y
         first_col = [
+            "WIDTH:",
+            "ENTRY:",
+            "PERFECT:"
+        ]
+        second_col = [
             f"{self.maze.w}",
             f"{self.maze.entry}",
             f"{self.maze.perfect}"
         ]
-        second_col = [
+        third_col = [
+            "HEIGHT:",
+            "EXIT:",
+            "SEED:"
+        ]
+        fourth_col = [
             f"{self.maze.h}",
             f"{self.maze.exit}",
         ]
         if self.maze.seed:
-            second_col.append(f"{self.maze.seed}")
+            fourth_col.append(f"'{self.maze.seed}'")
         else:
-            second_col.append(f"''")
+            fourth_col.append("None")
 
         for i, line in enumerate(first_col):
             self.mlx.mlx_string_put(self.mlx_ptr,
-                                self.win_1,
-                                first_col_x,
-                                first_col_y + i * 20,
-                                config_color,
-                                line)
+                                    self.win_1,
+                                    first_col_x,
+                                    first_col_y + i * 20,
+                                    config_color,
+                                    line)
+
+        for i, line in enumerate(second_col):
+            self.mlx.mlx_string_put(self.mlx_ptr,
+                                    self.win_1,
+                                    second_col_x,
+                                    second_col_y + i * 20,
+                                    config_color,
+                                    line)
+
+        for i, line in enumerate(third_col):
+            self.mlx.mlx_string_put(self.mlx_ptr,
+                                    self.win_1,
+                                    third_col_x,
+                                    third_col_y + i * 20,
+                                    config_color,
+                                    line)
+
+        for i, line in enumerate(fourth_col):
+            self.mlx.mlx_string_put(self.mlx_ptr,
+                                    self.win_1,
+                                    fourth_col_x,
+                                    fourth_col_y + i * 20,
+                                    config_color,
+                                    line)
 
     def redraw(self) -> None:
         for x in range(self.maze.h):

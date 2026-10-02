@@ -62,7 +62,7 @@ class MazeGenerator():
         self.populate_grid()
         self.solution: list[str] = []
         self.output: str = config["OUTPUT_FILE"]
-        self.seed = config.get("SEED")
+        self.seed: str | None = config.get("SEED")
         try:
             self.check_fortytwo()
         except FortyTwoShapeError as e:

@@ -116,5 +116,6 @@ def check_config() -> ConfigModel:
     }
     if "SEED" in env and env["SEED"] != "":
         random.seed(env["SEED"])
+        config.update({"SEED": env["SEED"]})
     parse_config(config)
     return config
